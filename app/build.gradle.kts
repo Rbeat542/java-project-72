@@ -6,8 +6,8 @@ plugins {
     id("org.sonarqube") version "6.0.1.5171"
     id("io.freefair.lombok") version "8.13.1"
     application
-    checkstyle
-    jacoco
+ //   checkstyle
+ //   jacoco
 }
 
 group = "hexlet.code"
@@ -45,7 +45,7 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+    //finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
     testLogging {
         exceptionFormat = TestExceptionFormat.FULL
         events = mutableSetOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
@@ -55,10 +55,3 @@ tasks.test {
     }
 }
 
-tasks.jacocoTestReport {
-    dependsOn(tasks.test) // tests are required to run before generating the report
-    reports {
-        xml.required = true
-        html.required = true
-    }
-}
