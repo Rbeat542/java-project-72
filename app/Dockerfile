@@ -11,6 +11,6 @@ RUN ./gradlew --no-daemon dependencies
 
 COPY src src
 
-RUN ./gradlew --no-daemon build
+RUN ./gradlew installDist
 
 CMD ./build/install/app/bin/app
