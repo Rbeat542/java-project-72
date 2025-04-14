@@ -2,15 +2,8 @@ FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 
-COPY gradle gradle
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
-COPY gradlew .
+COPY /app .
 
-RUN ./gradlew --no-daemon dependencies
-
-COPY src src
-
-RUN ./gradlew installDist
+RUN gradle installDist
 
 CMD ./build/install/app/bin/app
