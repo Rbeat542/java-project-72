@@ -6,8 +6,8 @@ plugins {
     id("org.sonarqube") version "6.0.1.5171"
     id("io.freefair.lombok") version "8.13.1"
     application
- //   checkstyle
- //   jacoco
+    checkstyle
+    jacoco
 }
 
 group = "hexlet.code"
@@ -20,7 +20,6 @@ repositories {
 application {
     mainClass.set("hexlet.code.App")
 }
-
 
 sonar {
     properties {
@@ -40,7 +39,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.slf4j:slf4j-simple:2.0.16")
     implementation("gg.jte:jte:3.1.9")
-
+    implementation("org.postgresql:postgresql:42.7.5")
 }
 
 tasks.test {
