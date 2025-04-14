@@ -16,4 +16,4 @@ COPY config config
 
 RUN ./gradlew --no-daemon build
 
-CMD app/build/install/App/bin/App
+CMD ./build/install/App/bin/App
