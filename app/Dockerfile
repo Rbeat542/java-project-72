@@ -1,7 +1,5 @@
 FROM eclipse-temurin:21-jdk
 
-FROM eclipse-temurin:21-jdk
-
 WORKDIR /app
 
 COPY gradle gradle
@@ -14,6 +12,6 @@ RUN ./gradlew --no-daemon dependencies
 COPY src src
 COPY config config
 
-RUN ./gradlew --no-daemon build
-RUN chmod +x /app/build/install/App/bin/App
-CMD ["app/build/install/App/bin/App"]
+RUN ./gradlew --no-daemon installDist
+
+CMD ./build/install/App/bin/App
