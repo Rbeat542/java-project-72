@@ -12,6 +12,9 @@ import io.javalin.Javalin;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.rendering.template.JavalinJte;
 
+import gg.jte.ContentType;   //stage 4
+import gg.jte.TemplateEngine;  //stage 4
+import gg.jte.resolve.ResourceCodeResolver;  //stage 4
 
 public class App {
     public static void main(String[] args) throws IOException, SQLException {
@@ -30,6 +33,13 @@ public class App {
         }
     }
 
+    private static TemplateEngine createTemplateEngine() {  //stage 4
+        ClassLoader classLoader = App.class.getClassLoader();
+        ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
+        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+        return templateEngine;
+    }
+
     public static Javalin getApp() throws IOException, SQLException {
         var hikariConfig = new HikariConfig();
         var dbUrl = getDbUrl();
@@ -46,13 +56,14 @@ public class App {
         }
         //BaseRepository.dataSource = dataSource;
 
+
         var app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
-            config.fileRenderer(new JavalinJte());
+            config.fileRenderer(new JavalinJte(createTemplateEngine()));  //stage 4
         });
 
         app.get(NamedRoutes.root(), ctx -> {
-            ctx.render("layout/root.jte");
+            ctx.render("app/src/main/resources/templates/root.jte");
         });
 
         return app;
