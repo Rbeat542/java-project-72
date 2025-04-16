@@ -24,14 +24,9 @@ public class App {
 
 
     public static String getDbUrl() throws SQLException {
-        String dbUrl = System.getenv("JDBC_DATABASE_URL");
-        System.out.println("GET_ENV : " + dbUrl);
-        if (null == dbUrl) {
-            return "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
-        } else {
-            return "jdbc:postgresql://dpg-cvna5949c44c73dl3ik0-a:5432/hexlet_rpoject_db?password"
-                + "=19LkTLBf9Zdc1af6TZUOxHKXmQhY0Jov&user=hexlet_rpoject_db_user";
-        }
+        String dbUrl = System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+        System.out.println("GET_ENV now is : " + dbUrl);
+        return  dbUrl;
     }
 
     private static TemplateEngine createTemplateEngine() {  //stage 4
@@ -51,10 +46,10 @@ public class App {
                 .lines().collect(Collectors.joining("\n"));
 
         // Получаем соединение, создаем стейтмент и выполняем запрос
-        try (var connection = dataSource.getConnection();
+/*        try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             statement.execute(sql);
-        }
+        }*/
         //BaseRepository.dataSource = dataSource;
 
 
