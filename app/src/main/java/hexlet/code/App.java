@@ -22,9 +22,10 @@ public class App {
         app.start(7070);
     }
 
+
     public static String getDbUrl() throws SQLException {
         String dbUrl = System.getenv("JDBC_DATABASE_URL");
-        System.out.println("GET_ENB : " + dbUrl);
+        System.out.println("GET_ENV : " + dbUrl);
         if (null == dbUrl) {
             return "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
         } else {
@@ -57,13 +58,24 @@ public class App {
         //BaseRepository.dataSource = dataSource;
 
 
+        /*
+        public static void main(String[] args) {
+            var app = Javalin.create(*//*config*//*)
+                    .get("/", ctx -> ctx.result("Hello World"))
+                    .start(7070);
+        }
+    }
+    */
+
+
         var app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
             config.fileRenderer(new JavalinJte(createTemplateEngine()));  //stage 4
         });
 
         app.get(NamedRoutes.root(), ctx -> {
-            ctx.render("app/src/main/resources/templates/root.jte");
+            //ctx.render("root.jte");
+            ctx.render("root.jte");
         });
 
         return app;

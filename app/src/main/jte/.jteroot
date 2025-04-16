@@ -1,1 +1,1 @@
-src/main/resources
+template_root_dir = 'src/main/resources/templates'
