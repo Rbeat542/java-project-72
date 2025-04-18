@@ -40,6 +40,7 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.16")
     implementation("gg.jte:jte:3.1.9")
     implementation("org.postgresql:postgresql:42.7.5")
+    implementation("org.apache.commons:commons-collections4:4.4")
 }
 
 tasks.test {

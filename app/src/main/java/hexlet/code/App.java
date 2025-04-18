@@ -2,12 +2,15 @@ package hexlet.code;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import hexlet.code.controller.UrlController;
+import hexlet.code.repository.BaseRepository;
 import io.javalin.Javalin;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.rendering.template.JavalinJte;
@@ -25,7 +28,6 @@ public class App {
 
     public static String getDbUrl() throws SQLException {
         String dbUrl = System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
-        System.out.println("GET_ENV now is : " + dbUrl);
         return  dbUrl;
     }
 
@@ -39,28 +41,23 @@ public class App {
     public static Javalin getApp() throws IOException, SQLException {
         var hikariConfig = new HikariConfig();
         var dbUrl = getDbUrl();
+        InputStream url;
         hikariConfig.setJdbcUrl(dbUrl);
         var dataSource = new HikariDataSource(hikariConfig);
-        var url = App.class.getClassLoader().getResourceAsStream("schema.sql");
+        if (dbUrl.contains("jdbc:h2")) {
+            url = App.class.getClassLoader().getResourceAsStream("schema.sql");
+        } else {
+            url = App.class.getClassLoader().getResourceAsStream("schemaPg.sql");
+        }
         var sql = new BufferedReader(new InputStreamReader(url))
                 .lines().collect(Collectors.joining("\n"));
 
         // Получаем соединение, создаем стейтмент и выполняем запрос
-/*        try (var connection = dataSource.getConnection();
+        try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             statement.execute(sql);
-        }*/
-        //BaseRepository.dataSource = dataSource;
-
-
-        /*
-        public static void main(String[] args) {
-            var app = Javalin.create(*//*config*//*)
-                    .get("/", ctx -> ctx.result("Hello World"))
-                    .start(7070);
         }
-    }
-    */
+        BaseRepository.dataSource = dataSource;
 
 
         var app = Javalin.create(config -> {
@@ -68,10 +65,10 @@ public class App {
             config.fileRenderer(new JavalinJte(createTemplateEngine()));  //stage 4
         });
 
-        app.get(NamedRoutes.root(), ctx -> {
-            //ctx.render("root.jte");
-            ctx.render("root.jte");
-        });
+        app.get(NamedRoutes.root(), UrlController::index);
+        app.get(NamedRoutes.build(), UrlController::build);
+        app.post(NamedRoutes.urlsPath(), UrlController::create);
+        app.get(NamedRoutes.urlPath("{id}"), UrlController::show);
 
         return app;
     }

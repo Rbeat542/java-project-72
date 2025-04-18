@@ -1,14 +1,29 @@
 package hexlet.code.model;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.Setter;
 
-@AllArgsConstructor
-@Getter
+
 @Setter
 public class Url {
-    private Integer id;
+    private Long id;
     private String name;
     private String createdAt;
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public Url(String name, String createdAt) {
+        this.name = name;
+        this.createdAt = createdAt;
+
+
+    }
 }
