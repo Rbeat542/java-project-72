@@ -6,7 +6,7 @@ plugins {
     id("org.sonarqube") version "6.0.1.5171"
     id("io.freefair.lombok") version "8.13.1"
     application
-    checkstyle
+    id("checkstyle")
     jacoco
 }
 
@@ -33,7 +33,6 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.assertj:assertj-core:3.11.1")
-
     implementation("com.h2database:h2:2.2.224")
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("io.javalin:javalin:6.6.0")
@@ -68,4 +67,8 @@ tasks.jacocoTestReport {
         xml.required = true
         html.required = true
     }
+}
+
+checkstyle {
+    toolVersion = "10.23.0"  // Последняя стабильная версия
 }
