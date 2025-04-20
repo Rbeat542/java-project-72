@@ -43,7 +43,7 @@ public class AddUrlTestCorrect {
                 .field("createdAt", datetime)
                 .asString();
         var body = responsePost.getBody().toString();
-        var url = UrlRepository.getEntities().getFirst();
+        var url = UrlRepository.getEntities().get(0);
 
         assertThat(body).contains(nameExpected);
         assertThat(body).doesNotContain("/project/72");
