@@ -61,6 +61,5 @@ public class UrlRepository extends BaseRepository {
         } catch (SQLException e) {
             return new ArrayList<>();
         }
-
     }
 }

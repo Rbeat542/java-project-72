@@ -7,7 +7,7 @@ import java.util.Map;
 import java.time.LocalDateTime;
 import static java.time.format.FormatStyle.MEDIUM;
 
-public class BuildUrlPage extends BasePage {
+public final class BuildUrlPage extends BasePage {
     private String name;
     private String createdAt;
     private Map<String, List<ValidationError<Object>>> errors;

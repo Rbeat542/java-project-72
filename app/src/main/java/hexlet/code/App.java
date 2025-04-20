@@ -51,7 +51,6 @@ public class App {
         }
         var sql = new BufferedReader(new InputStreamReader(url))
                 .lines().collect(Collectors.joining("\n"));
-        System.out.println(sql);
         // Получаем соединение, создаем стейтмент и выполняем запрос
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {

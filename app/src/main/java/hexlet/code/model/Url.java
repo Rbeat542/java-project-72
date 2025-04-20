@@ -3,7 +3,7 @@ import lombok.Setter;
 
 
 @Setter
-public class Url {
+public final class Url {
     private Long id;
     private String name;
     private String createdAt;
@@ -23,7 +23,5 @@ public class Url {
     public Url(String name, String createdAt) {
         this.name = name;
         this.createdAt = createdAt;
-
-
     }
 }

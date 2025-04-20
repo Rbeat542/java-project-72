@@ -30,13 +30,13 @@ public class UrlController {
 
     public static void build(Context ctx) {
         var page = new BuildUrlPage();
-        ctx.render("build.jte", model("page",page));
+        ctx.render("build.jte", model("page", page));
     }
 
     public static void create(Context ctx) throws ValidationException, URISyntaxException {
         var nameEntered = ctx.formParam("url");
         var createdAt = ctx.formParam("createdAt");
-        var name ="";
+        var name = "";
         try {
             var urlChecked = new URI(nameEntered).toURL();
             var protocol = urlChecked.getProtocol();
@@ -56,41 +56,19 @@ public class UrlController {
             var page = new BuildUrlPage(nameEntered, createdAt, errorsMap);
             ctx.sessionAttribute("flash", "Некорректный URL");
             page.setFlash(ctx.consumeSessionAttribute("flash"));
-            ctx.render("build.jte", model("page", page));
+            ctx.render("build.jte", model("page", page)).status(422);
         }
-
     }
 
-    public static void show(Context ctx) throws SQLException{
+    public static void show(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
         var page = new UrlPage(url);
-        ctx.render("show.jte", model("page",page));
+        ctx.render("show.jte", model("page", page));
     }
 
-    /*public static void processUrl(Context ctx, String name, String createdAt ) throws SQLException {
-        if (UrlRepository.getEntities().isEmpty()) {
-            var url = new Url(name, createdAt);
-            UrlRepository.save(url);
-            ctx.sessionAttribute("flash", "Страница успешно добавлена");
-            ctx.redirect(NamedRoutes.root());
-        } else {
-            for (var urlFromRepository : UrlRepository.getEntities()) {
-                if (urlFromRepository.getName().equals(name)) {
-                    ctx.sessionAttribute("flash", "Страница уже существует");
-                    ctx.redirect(NamedRoutes.root());
-                } else {
-                    var url = new Url(name, createdAt);
-                    UrlRepository.save(url);
-                    ctx.sessionAttribute("flash", "Страница успешно добавлена");
-                    ctx.redirect(NamedRoutes.root());
-                }
-            }
-        }
-    }*/
-
-    public static void processUrl(Context ctx, String name, String createdAt ) throws SQLException {
+    public static void processUrl(Context ctx, String name, String createdAt) throws SQLException {
         var urls = UrlRepository.getEntities();
         var isAlreadyExists = urls.stream()
                 .anyMatch(url -> url.getName().equals(name));
@@ -100,6 +78,7 @@ public class UrlController {
             var url = new Url(name, createdAt);
             UrlRepository.save(url);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
+            ctx.status(422);
         }
         ctx.redirect(NamedRoutes.root());
     }
