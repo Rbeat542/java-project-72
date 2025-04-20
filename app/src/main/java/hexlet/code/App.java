@@ -25,7 +25,6 @@ public class App {
         app.start(7070);
     }
 
-
     public static String getDbUrl() throws SQLException {
         String dbUrl = System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
         return  dbUrl;

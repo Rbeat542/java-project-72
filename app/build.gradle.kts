@@ -6,7 +6,7 @@ plugins {
     id("org.sonarqube") version "6.0.1.5171"
     id("io.freefair.lombok") version "8.13.1"
     application
-    id("checkstyle")
+    checkstyle
     jacoco
 }
 
@@ -70,5 +70,12 @@ tasks.jacocoTestReport {
 }
 
 checkstyle {
-    toolVersion = "10.23.0"  // Последняя стабильная версия
+    toolVersion = "10.12.4"
+}
+
+tasks.withType<Checkstyle>().configureEach {
+    reports {
+        xml.required = false
+        html.required = true
+    }
 }
