@@ -10,7 +10,6 @@ import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.validation.ValidationError;
 import io.javalin.validation.ValidationException;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -26,6 +25,11 @@ public class UrlController {
         var page = new UrlsPage(urls);
         page.setFlash(ctx.consumeSessionAttribute("flash"));
         ctx.render("index.jte", model("page", page));
+    }
+
+    public static void main(Context ctx) {
+        var urls = UrlRepository.getEntities();
+        ctx.render("mainpage.jte");
     }
 
     public static void build(Context ctx) {
@@ -74,12 +78,13 @@ public class UrlController {
                 .anyMatch(url -> url.getName().equals(name));
         if (isAlreadyExists) {
             ctx.sessionAttribute("flash", "Страница уже существует");
+
         } else {
             var url = new Url(name, createdAt);
             UrlRepository.save(url);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.status(422);
         }
-        ctx.redirect(NamedRoutes.root());
+        ctx.redirect(NamedRoutes.urlsPath());
     }
 }

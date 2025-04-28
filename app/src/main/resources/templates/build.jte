@@ -18,6 +18,7 @@ content = @`
     <form action="${NamedRoutes.urlsPath()}" method="post">
         <div>
             <label>
+                <br>
                 <p> Add name of domain</p>
                 <input type="text" name="url" value="${page.getName()}" />
             </label>

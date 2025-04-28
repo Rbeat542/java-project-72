@@ -17,4 +17,13 @@ public class NamedRoutes {
         return urlPath(id.toString());
     }
 
+
+    public static String urlCheckPath(Long id) {
+        return urlCheckPath(id.toString());
+    }
+
+    public static String urlCheckPath(String id) {
+        var path =  "/urls/" + id + "/checks";
+        return path;
+    }
 }

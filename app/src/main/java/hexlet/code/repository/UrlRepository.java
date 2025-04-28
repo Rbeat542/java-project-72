@@ -1,7 +1,6 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.Url;
-
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ public class UrlRepository extends BaseRepository {
             preparedStatement.setString(2, url.getCreatedAt());
             preparedStatement.executeUpdate();
             var generatedKeys = preparedStatement.getGeneratedKeys();
-            // Устанавливаем ID в сохраненную сущность
             if (generatedKeys.next()) {
                 url.setId(generatedKeys.getLong(1));
             } else {
@@ -60,6 +58,23 @@ public class UrlRepository extends BaseRepository {
             return result;
         } catch (SQLException e) {
             return new ArrayList<>();
+        }
+    }
+
+    public static void clear() throws SQLException {
+        var sql = "DELETE FROM url_checks";
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            var resultSet = stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        var sql2 = "DELETE FROM urls";
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql2)) {
+            var resultSet = stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e);
         }
     }
 }

@@ -5,19 +5,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.Random;
 import java.util.stream.Collectors;
-
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.controller.UrlController;
+import hexlet.code.controller.UrlCheckController;
 import hexlet.code.repository.BaseRepository;
 import io.javalin.Javalin;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.rendering.template.JavalinJte;
 
-import gg.jte.ContentType;   //stage 4
-import gg.jte.TemplateEngine;  //stage 4
-import gg.jte.resolve.ResourceCodeResolver;  //stage 4
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.resolve.ResourceCodeResolver;
 
 public class App {
     public static void main(String[] args) throws IOException, SQLException {
@@ -25,19 +26,19 @@ public class App {
         app.start(7070);
     }
 
-    public static String getDbUrl() throws SQLException {
-        String dbUrl = System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
-        return  dbUrl;
+    public static String getDbUrl() {
+        var randomStr = new Random();
+        return System.getenv().getOrDefault("JDBC_DATABASE_URL",
+                "jdbc:h2:mem:project" + randomStr + ";DB_CLOSE_DELAY=-1;");
     }
 
-    private static TemplateEngine createTemplateEngine() {  //stage 4
+    private static TemplateEngine createTemplateEngine() {
         ClassLoader classLoader = App.class.getClassLoader();
         ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
-        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
-        return templateEngine;
+        return TemplateEngine.create(codeResolver, ContentType.Html);
     }
 
-    public static Javalin getApp() throws IOException, SQLException {
+    public static Javalin getApp() throws SQLException {
         var hikariConfig = new HikariConfig();
         var dbUrl = getDbUrl();
         InputStream url;
@@ -50,7 +51,7 @@ public class App {
         }
         var sql = new BufferedReader(new InputStreamReader(url))
                 .lines().collect(Collectors.joining("\n"));
-        // Получаем соединение, создаем стейтмент и выполняем запрос
+
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             statement.execute(sql);
@@ -58,17 +59,17 @@ public class App {
 
         BaseRepository.dataSource = dataSource;
 
-
         var app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
-            config.fileRenderer(new JavalinJte(createTemplateEngine()));  //stage 4
+            config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
-        app.get(NamedRoutes.root(), UrlController::index);
+        app.get(NamedRoutes.root(), UrlController::main);
+        app.get(NamedRoutes.urlsPath(), UrlController::index);
         app.get(NamedRoutes.build(), UrlController::build);
         app.post(NamedRoutes.urlsPath(), UrlController::create);
         app.get(NamedRoutes.urlPath("{id}"), UrlController::show);
-
+        app.post(NamedRoutes.urlCheckPath("{id}"), UrlCheckController::check);
         return app;
     }
 }
