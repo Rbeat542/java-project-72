@@ -52,7 +52,7 @@ public class ResponseHandler {
             while (matcher.find()) {
                 list.add(body.substring(matcher.start(), matcher.end()));
             }
-            return list.getFirst().toString();
+            return list.get(0).toString();
         } catch (Exception e) {
             return ("No <h1> tag found");
         }
@@ -67,7 +67,7 @@ public class ResponseHandler {
             while (matcher.find()) {
                 list.add(body.substring(matcher.start(), matcher.end()));
             }
-            return list.getFirst().toString();
+            return list.get(0).toString();
         } catch (Exception e) {
             return ("No <title> tag found");
         }
@@ -86,7 +86,7 @@ public class ResponseHandler {
             while (matcher.find()) {
                 list.add(body.substring(matcher.start(), matcher.end()));
             }
-            return list.getFirst().toString();
+            return list.get(0).toString();
         } catch (Exception e) {
             return ("No <description> tag found");
         }
