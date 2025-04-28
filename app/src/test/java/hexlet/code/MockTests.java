@@ -58,7 +58,7 @@ class MockTests {
                 formParams.put("name", mockUrlName);
                 var response = client.post(path, formParams);
                 assertThat(response.code()).isEqualTo(200);
-                UrlCheck checkedUrl = UrlCheckRepository.getEntities(mockUrl.getId()).getFirst();
+                UrlCheck checkedUrl = UrlCheckRepository.getEntities(mockUrl.getId()).get(0);
                 assertThat(checkedUrl.getStatusCode()).isEqualTo(200);
                 assertThat(checkedUrl.getTitle()).isEqualTo("Web pages analyzer");
                 assertThat(checkedUrl.getH1()).isEqualTo("Here is some header with h1 size");
