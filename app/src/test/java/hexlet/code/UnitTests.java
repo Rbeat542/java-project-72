@@ -6,11 +6,12 @@ import hexlet.code.repository.UrlRepository;
 import io.javalin.Javalin;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -22,9 +23,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UnitTests {
     private static Javalin app;
     private static String baseUrl;
+    private static MockWebServer mockWebServer;
 
     @BeforeAll
-    public static void beforeAll() throws SQLException {
+    public static void beforeAll() throws SQLException, IOException {
         app = App.getApp();
         app.start(7070);
         int port = app.port();
@@ -34,6 +36,23 @@ public class UnitTests {
     @BeforeEach
     public final void beforeEach() throws SQLException, IOException {
         UrlRepository.clear();
+    }
+
+    @Test
+    public void mainTest() throws IOException {
+        MockWebServer mockWebServer = new MockWebServer();
+        mockWebServer.start();
+        MockResponse mockResponse = new MockResponse()
+                .setBody("fake body")
+                .setResponseCode(200);
+        mockWebServer.enqueue(mockResponse);
+
+        String mockUrlName = mockWebServer.url("/").toString();
+        var response = Unirest.get(mockUrlName).asString();
+        var body = response.getBody().toString();
+        assertThat(body).contains("fake");
+        assertThat(body).doesNotContain(Constants.URLNAMECORRECT, Constants.URLNAMEINCORRECT);
+        assertThat(response.getStatus()).isEqualTo(200);
     }
 
     @Test
@@ -174,7 +193,8 @@ public class UnitTests {
 
 
     @AfterAll
-    public static void afterAll() {
+    public static void afterAll() throws IOException {
         app.stop();
+        //mockWebServer.shutdown();
     }
 }
