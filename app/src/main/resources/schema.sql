@@ -7,6 +7,7 @@ CREATE TABLE urls (
 );
 
 
+
 DROP TABLE IF EXISTS url_checks;
 
 CREATE TABLE url_checks (

@@ -27,7 +27,6 @@ public class UrlCheckRepository extends BaseRepository {
         }
     }
 
-
     public static List<UrlCheck> getEntities(Long url) {
         var sql = "SELECT * FROM url_checks WHERE url_id=?";
         try (var conn = dataSource.getConnection(); var stmt = conn.prepareStatement(sql)) {
@@ -56,4 +55,5 @@ public class UrlCheckRepository extends BaseRepository {
             return new ArrayList<>();
         }
     }
+
 }

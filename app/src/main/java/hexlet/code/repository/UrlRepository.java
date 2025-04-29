@@ -11,7 +11,7 @@ public class UrlRepository extends BaseRepository {
     public static void save(Url url) throws SQLException {
         String sql = "INSERT INTO urls (name, created_At) VALUES (?, ?)";
         try (var conn = dataSource.getConnection();
-             var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, url.getName());
             preparedStatement.setString(2, url.getCreatedAt());
             preparedStatement.executeUpdate();
@@ -62,19 +62,13 @@ public class UrlRepository extends BaseRepository {
     }
 
     public static void clear() throws SQLException {
-        var sql = "DELETE FROM url_checks";
         try (var conn = dataSource.getConnection();
-             var stmt = conn.prepareStatement(sql)) {
-            var resultSet = stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e);
+             var stmt = conn.createStatement()) {
+            stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
+            stmt.execute("TRUNCATE TABLE url_checks RESTART IDENTITY");
+            stmt.execute("TRUNCATE TABLE urls RESTART IDENTITY");
+            stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
         }
-        var sql2 = "DELETE FROM urls";
-        try (var conn = dataSource.getConnection();
-             var stmt = conn.prepareStatement(sql2)) {
-            var resultSet = stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
+
     }
 }

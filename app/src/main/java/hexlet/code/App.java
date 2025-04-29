@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.util.Random;
 import java.util.stream.Collectors;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -27,9 +26,8 @@ public class App {
     }
 
     public static String getDbUrl() {
-        var randomStr = new Random();
         return System.getenv().getOrDefault("JDBC_DATABASE_URL",
-                "jdbc:h2:mem:project" + randomStr + ";DB_CLOSE_DELAY=-1;");
+                "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
     }
 
     private static TemplateEngine createTemplateEngine() {

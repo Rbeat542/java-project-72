@@ -78,7 +78,6 @@ public class UrlController {
                 .anyMatch(url -> url.getName().equals(name));
         if (isAlreadyExists) {
             ctx.sessionAttribute("flash", "Страница уже существует");
-
         } else {
             var url = new Url(name, createdAt);
             UrlRepository.save(url);
