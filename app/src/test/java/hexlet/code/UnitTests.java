@@ -32,7 +32,7 @@ public final class UnitTests {
         baseUrl = "http://localhost:" + port;
 
         String jdbcUrl = System.getProperty("JDBC_DATABASE_URL", "");
-        assumeTrue(jdbcUrl.equals("h2") || jdbcUrl.equals(""), "Test only for H2");
+        assumeTrue(!jdbcUrl.contains("postgresql"), "Test only for H2");
     }
 
     @BeforeEach
