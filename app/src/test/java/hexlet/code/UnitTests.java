@@ -6,6 +6,7 @@ import hexlet.code.repository.UrlRepository;
 import io.javalin.Javalin;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
@@ -14,19 +15,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-import static java.time.format.FormatStyle.MEDIUM;
+import java.sql.Timestamp;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UnitTests {
+@Slf4j
+public final class UnitTests {
     private static Javalin app;
     private static String baseUrl;
-    private static MockWebServer mockWebServer;
 
     @BeforeAll
-    public static void beforeAll() throws SQLException, IOException {
+    public static void beforeAll() throws SQLException {
         app = App.getApp();
         app.start(7070);
         int port = app.port();
@@ -34,12 +32,13 @@ public class UnitTests {
     }
 
     @BeforeEach
-    public final void beforeEach() throws SQLException, IOException {
+    public void beforeEach() throws SQLException {
         UrlRepository.clear();
     }
 
+
     @Test
-    public void mainTest() throws IOException {
+    public void mockTest() throws IOException {
         MockWebServer mockWebServer = new MockWebServer();
         mockWebServer.start();
         MockResponse mockResponse = new MockResponse()
@@ -53,6 +52,7 @@ public class UnitTests {
         assertThat(body).contains("fake");
         assertThat(body).doesNotContain(Constants.URLNAMECORRECT, Constants.URLNAMEINCORRECT);
         assertThat(response.getStatus()).isEqualTo(200);
+        mockWebServer.shutdown();
     }
 
     @Test
@@ -66,34 +66,34 @@ public class UnitTests {
     @Test
     public void testAddCorrectUrl() {
         var nameExpected = Constants.URLNAMECORRECT;
-        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(MEDIUM);
-        final var datetime = LocalDateTime.now().format(formatter);
+        String now = new Timestamp(System.currentTimeMillis()).toString();
 
         HttpResponse response = Unirest
                 .post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
-                .field("createdAt", datetime)
+                .field("createdAt", now)
                 .asString();
+        log.info("ATT. Now is " + now + "from test");
+        log.info("ATT. Response is " + response.toString());
         var body = response.getBody().toString();
+        //log.info("ATT. Body is " + body);
         var url = UrlRepository.getEntities().getFirst();
 
         assertThat(UrlRepository.getEntities().size()).isEqualTo(1);
         assertThat(url.getName()).isEqualTo(nameExpected);
-        assertThat(url.getCreatedAt()).isEqualTo(datetime);
+        assertThat(url.getCreatedAt().toString()).isEqualTo(now.toString());
         assertThat(body).contains(nameExpected);
         assertThat(body).doesNotContain("/project/72");
         assertThat(response.getStatus()).isEqualTo(200);
     }
 
     @Test
-    public void testAddWrongUrl() throws SQLException, IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(MEDIUM);
-        var datetime = LocalDateTime.now().format(formatter);
-
+    public void testAddWrongUrl()  {
+        String now = new Timestamp(System.currentTimeMillis()).toString();
         HttpResponse responsePost = Unirest
                 .post(baseUrl + "/urls")
                 .field("url", Constants.URLNAMEINCORRECT)
-                .field("createdAt", datetime)
+                .field("createdAt", now)
                 .asString();
         var body = responsePost.getBody().toString();
 
@@ -104,50 +104,26 @@ public class UnitTests {
 
     @Test
     public void testShowCorrectIdPage() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(MEDIUM);
-        var datetime = LocalDateTime.now().format(formatter);
+        String now = new Timestamp(System.currentTimeMillis()).toString();
 
-        Unirest.post(baseUrl + "/urls").field("url", Constants.URLNAME).field("createdAt", datetime).asString();
+        Unirest.post(baseUrl + "/urls").field("url", Constants.URLNAME).field("createdAt", now).asString();
         var response = Unirest.get(baseUrl + "/urls/1").asString();
         var body = response.getBody().toString();
 
         assertThat(body).contains(Constants.URLNAMECORRECT);
-        assertThat(body).contains(datetime);
+        assertThat(body).contains(now);
         assertThat(body).doesNotContain("/project/72");
         assertThat(response.getStatus()).isEqualTo(200);
     }
 
     @Test
-    public void testAddCorrectUrlToRepository() {
-        var nameExpected = Constants.URLNAMECORRECT;
-        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(MEDIUM);
-        final var datetime = LocalDateTime.now().format(formatter);
-
-        HttpResponse responsePost = Unirest
-                .post(baseUrl + "/urls")
-                .field("url", Constants.URLNAME)
-                .field("createdAt", datetime)
-                .asString();
-        var body = responsePost.getBody().toString();
-        var url = UrlRepository.getEntities().get(0);
-
-        assertThat(url.getName()).isEqualTo(nameExpected);
-        assertThat(url.getCreatedAt()).isEqualTo(datetime);
-        assertThat(body).contains(nameExpected);
-        assertThat(body).doesNotContain("/project/72");
-        assertThat(responsePost.getStatus()).isEqualTo(200);
-        assertThat(UrlCheckRepository.getEntities(0L)).isEmpty();
-    }
-
-    @Test
     public void testUrlCheckToRepository() throws SQLException {
         var nameExpected = Constants.URLNAMECORRECT;
-        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(MEDIUM);
-        final var datetime = LocalDateTime.now().format(formatter);
-        UrlRepository.save(new Url("http://google.com", datetime));
+        var now = new Timestamp(System.currentTimeMillis());
+        UrlRepository.save(new Url("http://google.com", now));
         Unirest.post(baseUrl + "/urls/1/checks")
                 .field("status_code", "200")
-                .field("createdAt", datetime)
+                .field("createdAt", now.toString())
                 .field("h1", "Url info")
                 .field("title", "Url page")
                 .field("url_id", "1")
@@ -158,28 +134,11 @@ public class UnitTests {
 
 
     @Test
-    public void testA00ddWrongUrl() throws SQLException, IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(MEDIUM);
-        var datetime = LocalDateTime.now().format(formatter);
-        UrlRepository.clear();
-        HttpResponse responsePost = Unirest
-                .post(baseUrl + "/urls")
-                .field("url", Constants.URLNAMEINCORRECT)
-                .field("createdAt", datetime)
-                .asString();
-        var body = responsePost.getBody().toString();
-
-        assertThat(body).contains("Некорректный URL");
-        assertThat(responsePost.getStatus()).isEqualTo(422);
-        assertThat(UrlRepository.getEntities()).isEmpty();
-    }
-
-    @Test
     public void testCreateCorrectUrl() {
-        var datetime = LocalDateTime.now().toString();
+        String now = new Timestamp(System.currentTimeMillis()).toString();
         Unirest.post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
-                .field("createdAt", datetime)
+                .field("createdAt", now)
                 .asString();
         HttpResponse response = Unirest
                 .get(baseUrl + "/urls/2")
@@ -195,6 +154,6 @@ public class UnitTests {
     @AfterAll
     public static void afterAll() throws IOException {
         app.stop();
-        //mockWebServer.shutdown();
+        //
     }
 }

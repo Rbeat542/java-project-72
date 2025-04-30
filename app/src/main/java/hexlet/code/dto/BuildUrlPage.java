@@ -1,27 +1,20 @@
 package hexlet.code.dto;
 
 import io.javalin.validation.ValidationError;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.time.LocalDateTime;
-import static java.time.format.FormatStyle.MEDIUM;
+import java.sql.Timestamp;
 
 public final class BuildUrlPage extends BasePage {
     private String name;
-    private String createdAt;
+    private Timestamp createdAt;
     private Map<String, List<ValidationError<Object>>> errors;
 
     public BuildUrlPage() {
-        this.createdAt = getCurrentDateTime();
+        this.createdAt = new Timestamp(System.currentTimeMillis());
     }
 
-    public String getCurrentDateTime() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(MEDIUM);
-        return LocalDateTime.now().format(formatter);
-    }
-
-    public BuildUrlPage(String name, String createdAt, Map<String, List<ValidationError<Object>>> errors) {
+    public BuildUrlPage(String name, Timestamp createdAt, Map<String, List<ValidationError<Object>>> errors) {
         this.name = name;
         this.createdAt = createdAt;
         this.errors = errors;
@@ -31,7 +24,7 @@ public final class BuildUrlPage extends BasePage {
         return name;
     }
 
-    public String getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 

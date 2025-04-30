@@ -1,19 +1,22 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.Url;
+import lombok.extern.slf4j.Slf4j;
+
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 public class UrlRepository extends BaseRepository {
     public static void save(Url url) throws SQLException {
         String sql = "INSERT INTO urls (name, created_At) VALUES (?, ?)";
         try (var conn = dataSource.getConnection();
-            var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, url.getName());
-            preparedStatement.setString(2, url.getCreatedAt());
+            preparedStatement.setTimestamp(2, url.getCreatedAt());
             preparedStatement.executeUpdate();
             var generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -32,7 +35,7 @@ public class UrlRepository extends BaseRepository {
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
-                var createdAt = resultSet.getString("created_At");
+                var createdAt = resultSet.getTimestamp("created_At");
                 var url = new Url(name, createdAt);
                 url.setId(id);
                 return Optional.of(url);
@@ -50,7 +53,8 @@ public class UrlRepository extends BaseRepository {
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var createdAt = resultSet.getString("created_At");
+                var createdAt = resultSet.getTimestamp("created_At");
+                log.info("ATT. CreatedAt is " + createdAt + " from DB urls (getEntitities)");
                 var url = new Url(name, createdAt);
                 url.setId(id);
                 result.add(url);
@@ -71,4 +75,5 @@ public class UrlRepository extends BaseRepository {
         }
 
     }
+
 }

@@ -14,15 +14,21 @@ import hexlet.code.repository.BaseRepository;
 import io.javalin.Javalin;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.rendering.template.JavalinJte;
-
+import lombok.extern.slf4j.Slf4j;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
 
+@Slf4j
 public class App {
     public static void main(String[] args) throws IOException, SQLException {
         var app = getApp();
-        app.start(7070);
+        app.start(getPort());
+    }
+
+    private static int getPort() {
+        String port = System.getenv().getOrDefault("PORT", "7070");
+        return Integer.valueOf(port);
     }
 
     public static String getDbUrl() {
@@ -49,6 +55,8 @@ public class App {
         }
         var sql = new BufferedReader(new InputStreamReader(url))
                 .lines().collect(Collectors.joining("\n"));
+
+        //log.info(sql);
 
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {

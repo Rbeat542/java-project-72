@@ -5,6 +5,7 @@ plugins {
     id("java")
     id("org.sonarqube") version "6.0.1.5171"
     id("io.freefair.lombok") version "8.13.1"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     application
     checkstyle
     jacoco
@@ -39,9 +40,8 @@ dependencies {
     implementation("io.javalin:javalin:6.6.0")
     implementation("io.javalin:javalin-testtools:6.6.0")
     implementation("io.javalin:javalin-rendering:6.5.0")
-    implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.slf4j:slf4j-simple:2.0.16")
-    implementation("gg.jte:jte:3.1.9")
+    implementation("gg.jte:jte:3.2.1")
     implementation ("org.jsoup:jsoup:1.18.1")
     implementation("org.postgresql:postgresql:42.7.5")
     implementation("org.apache.commons:commons-collections4:4.4")

@@ -25,7 +25,7 @@ content = @`
         </div>
         <div>
             <label>
-                <input type="hidden" name="createdAt" value="${page.getCreatedAt()}" />
+                <input type="hidden" name="createdAt" value="${page.getCreatedAt().toString()}" />
             </label>
         </div>
         <input type="submit" value="Add domain" />

@@ -10,14 +10,19 @@ import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.validation.ValidationError;
 import io.javalin.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Objects;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
+@Slf4j
 public class UrlController {
 
     public static void index(Context ctx) {
@@ -39,7 +44,7 @@ public class UrlController {
 
     public static void create(Context ctx) throws ValidationException, URISyntaxException {
         var nameEntered = ctx.formParam("url");
-        var createdAt = ctx.formParam("createdAt");
+        var createdAt = Timestamp.valueOf(Objects.requireNonNull(ctx.formParam("createdAt")));
         var name = "";
         try {
             var urlChecked = new URI(nameEntered).toURL();
@@ -51,6 +56,7 @@ public class UrlController {
             } else {
                 name =  protocol + "://" + host;
             }
+            log.info("ATT. In UrlController createdAt is " + createdAt + "from CTX");
             processUrl(ctx, name, createdAt);
         } catch (Exception e) {
             var valError = new ValidationError<>(e.toString());
@@ -72,7 +78,7 @@ public class UrlController {
         ctx.render("show.jte", model("page", page));
     }
 
-    public static void processUrl(Context ctx, String name, String createdAt) throws SQLException {
+    public static void processUrl(Context ctx, String name, Timestamp createdAt) throws SQLException {
         var urls = UrlRepository.getEntities();
         var isAlreadyExists = urls.stream()
                 .anyMatch(url -> url.getName().equals(name));

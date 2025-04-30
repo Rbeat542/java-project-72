@@ -45,7 +45,7 @@ content = @`
                 <th><a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a></th>
                 @if(!UrlCheckRepository.getEntities(url.getId()).isEmpty())
                     !{var list = UrlCheckRepository.getEntities(url.getId());}
-                    <th>${list.getLast().getCreatedAt()}</th>
+                    <th>${list.getLast().getCreatedAt().toString()}</th>
                     <th>${list.getLast().getStatusCode()}</th>
                 @else
                     <th></th>

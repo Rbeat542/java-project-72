@@ -27,7 +27,7 @@ content = @`
                 <tr>
                     <th>${page.getUrl().getId()}</th>
                     <th>${page.getUrl().getName()}</th>
-                    <th>${page.getUrl().getCreatedAt()}</th>
+                    <th>${page.getUrl().getCreatedAt().toString()}</th>
                 </tr>
             </tbody>
         </table>
@@ -68,7 +68,7 @@ content = @`
                     <th>${list.get(i).getTitle()}</th>
                     <th>${list.get(i).getH1()}</th>
                     <th>${list.get(i).getDescription()}</th>
-                    <th>${list.get(i).getCreatedAt()}</th>
+                    <th>${list.get(i).getCreatedAt().toString()}</th>
                 </tr>
             @endfor
         @endif
