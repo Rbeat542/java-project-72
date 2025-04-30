@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS urls;
+DROP TABLE IF EXISTS urls CASCADE;
 
 CREATE TABLE urls (
     id SERIAL PRIMARY KEY,
@@ -9,7 +9,7 @@ CREATE TABLE urls (
 
 DROP TABLE IF EXISTS url_checks;
 
-CREATE TABLE url_checks (
+CREATE TABLE url_checks CASCADE(
     id SERIAL PRIMARY KEY,
     status_code BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,

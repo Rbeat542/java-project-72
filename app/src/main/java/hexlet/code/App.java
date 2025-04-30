@@ -45,6 +45,7 @@ public class App {
     public static Javalin getApp() throws SQLException {
         var hikariConfig = new HikariConfig();
         var dbUrl = getDbUrl();
+        log.info("JDBC_DATABASE_URL = " + dbUrl);
         InputStream url;
         hikariConfig.setJdbcUrl(dbUrl);
         var dataSource = new HikariDataSource(hikariConfig);
