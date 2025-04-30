@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @Slf4j
 public final class UnitTests {
@@ -29,11 +30,15 @@ public final class UnitTests {
         app.start(7070);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
+
+        String jdbcUrl = System.getProperty("JDBC_DATABASE_URL", "");
+        assumeTrue(jdbcUrl.equals("h2") || jdbcUrl.equals(""), "Test only for H2");
     }
 
     @BeforeEach
     public void beforeEach() throws SQLException {
         UrlRepository.clear();
+
     }
 
 
