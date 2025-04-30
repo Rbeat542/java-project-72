@@ -7,6 +7,7 @@ import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -18,8 +19,8 @@ import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+@Slf4j
 public class UrlCheckController {
-
     public static void check(Context ctx) throws ValidationException, SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
@@ -30,7 +31,8 @@ public class UrlCheckController {
             UrlCheckRepository.save(urlCheck);
             ctx.redirect(NamedRoutes.urlPath(id));
         } catch (Exception e) {
-            System.out.println("Something's wrong. Exception is :" + e);
+            log.info("Exception is :" + e);
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -52,7 +54,8 @@ public class UrlCheckController {
             urlCheck.setCreatedAt(new Timestamp(System.currentTimeMillis()).toString());
             return urlCheck;
         } catch (Exception e) {
-            System.out.println("Something's wrong. Exception is :" + e);
+            log.info("Exception is :" + e);
+            Thread.currentThread().interrupt();
             return new UrlCheck();
         }
     }
