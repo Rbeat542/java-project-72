@@ -15,7 +15,9 @@ CREATE TABLE url_checks(
     title VARCHAR(255) NOT NULL,
     h1 VARCHAR(200) NOT NULL,
     description VARCHAR(500) NOT NULL,
-    url_id BIGINT REFERENCES urls(id)
-    ON DELETE CASCADE,
+    url_id BIGINT REFERENCES urls(id),
+        FOREIGN KEY(url_id)
+           REFERENCES urls(id)
+           ON DELETE CASCADE,
     created_at TIMESTAMP
 );
