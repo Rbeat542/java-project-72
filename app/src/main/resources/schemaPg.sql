@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS urls;
+DROP TABLE IF EXISTS urls, url_checks;
 
 CREATE TABLE urls (
     id SERIAL PRIMARY KEY,
@@ -7,17 +7,12 @@ CREATE TABLE urls (
 );
 
 
-DROP TABLE IF EXISTS url_checks;
-
-CREATE TABLE url_checks(
+CREATE TABLE url_checks (
     id SERIAL PRIMARY KEY,
     status_code BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
     h1 VARCHAR(200) NOT NULL,
     description VARCHAR(500) NOT NULL,
     url_id BIGINT REFERENCES urls(id),
-        FOREIGN KEY(url_id)
-           REFERENCES urls(id)
-           ON DELETE CASCADE,
     created_at TIMESTAMP
 );
