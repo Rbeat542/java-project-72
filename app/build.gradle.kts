@@ -80,3 +80,9 @@ tasks.withType<Checkstyle>().configureEach {
         html.required = true
     }
 }
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(23)
+    }
+}
