@@ -1,5 +1,6 @@
 package hexlet.code.repository;
 
+import hexlet.code.App;
 import hexlet.code.model.Url;
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,10 +69,17 @@ public class UrlRepository extends BaseRepository {
     public static void clear() throws SQLException {
         try (var conn = dataSource.getConnection();
              var stmt = conn.createStatement()) {
-            stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
-            stmt.execute("TRUNCATE TABLE url_checks RESTART IDENTITY");
-            stmt.execute("TRUNCATE TABLE urls RESTART IDENTITY");
-            stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
+            var dbUrl = App.getDbUrl();
+            if (dbUrl.contains("h2")) {
+                stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
+                stmt.execute("TRUNCATE TABLE url_checks RESTART IDENTITY");
+                stmt.execute("TRUNCATE TABLE urls RESTART IDENTITY");
+                stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
+            } else  if (dbUrl.contains("postgresql")) {
+                stmt.execute("TRUNCATE TABLE url_checks, urls RESTART IDENTITY CASCADE");
+            } else {
+                throw new UnsupportedOperationException("Неизвестная БД: ");
+            }
         }
 
     }
