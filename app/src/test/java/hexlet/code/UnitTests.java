@@ -1,6 +1,5 @@
 package hexlet.code;
 
-import hexlet.code.App;
 import hexlet.code.model.Url;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
@@ -28,7 +27,7 @@ public final class UnitTests {
 
     @BeforeAll
     public static void beforeAll() throws SQLException, TestAbortedException {
-        app = App.getApp();
+        app = hexlet.code.App.getApp();
         app.start(7070);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
