@@ -1,6 +1,5 @@
 package hexlet.code.repository;
 
-import hexlet.code.App;
 import hexlet.code.model.Url;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static hexlet.code.App.getDbUrl;
 
 @Slf4j
 public class UrlRepository extends BaseRepository {
@@ -69,7 +70,7 @@ public class UrlRepository extends BaseRepository {
     public static void clear() throws SQLException {
         try (var conn = dataSource.getConnection();
              var stmt = conn.createStatement()) {
-            var dbUrl = App.getDbUrl();
+            var dbUrl = getDbUrl();
             if (dbUrl.contains("h2")) {
                 stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
                 stmt.execute("TRUNCATE TABLE url_checks RESTART IDENTITY");
