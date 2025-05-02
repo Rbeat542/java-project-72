@@ -8,7 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import static hexlet.code.App.getDbUrl;
 
 @Slf4j
