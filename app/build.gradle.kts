@@ -86,7 +86,3 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
-
-tasks.register("install") {
-    dependsOn("installDist")
-}
