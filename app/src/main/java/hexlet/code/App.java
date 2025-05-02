@@ -69,7 +69,7 @@ public class App {
             config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
-        app.get(NamedRoutes.root(), UrlController::main);
+        app.get(NamedRoutes.root(), UrlController::mainPage);
         app.get(NamedRoutes.urlsPath(), UrlController::index);
         app.get(NamedRoutes.build(), UrlController::build);
         app.post(NamedRoutes.urlsPath(), UrlController::create);

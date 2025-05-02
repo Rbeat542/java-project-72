@@ -32,7 +32,7 @@ public class UrlController {
         ctx.render("index.jte", model("page", page));
     }
 
-    public static void main(Context ctx) {
+    public static void mainPage(Context ctx) {
         var urls = UrlRepository.getEntities();
         ctx.render("mainpage.jte");
     }
