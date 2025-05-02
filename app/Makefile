@@ -6,7 +6,7 @@ install:
 	./gradlew install
 
 setup:
-	./gradlew clean install --stacktrace --info
+	./gradlew clean install
 
 run-dist:
 	./gradlew clean

@@ -69,7 +69,7 @@ public final class UnitTests {
         var nameExpected = Constants.URLNAMECORRECT;
         String now = new Timestamp(System.currentTimeMillis()).toString();
         var jd = System.getenv("JDBC_DATABASE_URL");
-        HttpResponse response = Unirest
+        HttpResponse<String> response = Unirest
                 .post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
                 .field("createdAt", now)
@@ -155,6 +155,5 @@ public final class UnitTests {
     @AfterAll
     public static void afterAll() throws IOException {
         app.stop();
-        //
     }
 }
