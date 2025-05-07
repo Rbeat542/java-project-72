@@ -23,11 +23,6 @@ content = @`
                 <input type="text" name="url" value="${page.getName()}" />
             </label>
         </div>
-        <div>
-            <label>
-                <input type="hidden" name="createdAt" value="${page.getCreatedAt().toString()}" />
-            </label>
-        </div>
         <input type="submit" value="Add domain" />
     </form>`
 )

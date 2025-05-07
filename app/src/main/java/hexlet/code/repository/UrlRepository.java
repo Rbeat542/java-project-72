@@ -37,7 +37,8 @@ public class UrlRepository extends BaseRepository {
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
                 var createdAt = resultSet.getTimestamp("created_At");
-                var url = new Url(name, createdAt);
+                var url = new Url(name);
+                url.setCreatedAt(createdAt);
                 url.setId(id);
                 return Optional.of(url);
             }
@@ -56,7 +57,8 @@ public class UrlRepository extends BaseRepository {
                 var name = resultSet.getString("name");
                 var createdAt = resultSet.getTimestamp("created_At");
                 log.info("ATT. CreatedAt is " + createdAt + " from DB urls (getEntitities)");
-                var url = new Url(name, createdAt);
+                var url = new Url(name);
+                url.setCreatedAt(createdAt);
                 url.setId(id);
                 result.add(url);
             }

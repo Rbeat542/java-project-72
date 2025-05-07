@@ -18,7 +18,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.HashMap;
-import java.util.Objects;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
@@ -43,9 +42,9 @@ public class UrlController {
     }
 
     public static void create(Context ctx) throws ValidationException, URISyntaxException {
-        var nameEntered = ctx.formParam("url");
-        var createdAt = Timestamp.valueOf(Objects.requireNonNull(ctx.formParam("createdAt")));
-        var name = "";
+        String nameEntered = ctx.formParam("url");
+        Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+        String name = "";
         try {
             var urlChecked = new URI(nameEntered).toURL();
             var protocol = urlChecked.getProtocol();
@@ -56,7 +55,7 @@ public class UrlController {
             } else {
                 name =  protocol + "://" + host;
             }
-            log.info("ATT. In UrlController createdAt is " + createdAt + "from CTX");
+            log.info("ATT. In UrlController the _createdAt_ variable is generated now and is " + createdAt.toString());
             processUrl(ctx, name, createdAt);
         } catch (Exception e) {
             var valError = new ValidationError<>(e.toString());
@@ -85,7 +84,8 @@ public class UrlController {
         if (isAlreadyExists) {
             ctx.sessionAttribute("flash", "Страница уже существует");
         } else {
-            var url = new Url(name, createdAt);
+            var url = new Url(name);
+            url.setCreatedAt(createdAt);
             UrlRepository.save(url);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.status(422);

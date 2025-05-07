@@ -17,6 +17,8 @@ import org.opentest4j.TestAbortedException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -67,22 +69,16 @@ public final class UnitTests {
     @Test
     public void testAddCorrectUrl() {
         var nameExpected = Constants.URLNAMECORRECT;
-        String now = new Timestamp(System.currentTimeMillis()).toString();
-        var jd = System.getenv("JDBC_DATABASE_URL");
         HttpResponse<String> response = Unirest
                 .post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
-                .field("createdAt", now)
                 .asString();
-        log.info("ATT. Now is " + now + "from test");
         log.info("ATT. Response is " + response.toString());
         var body = response.getBody().toString();
-
         var url = UrlRepository.getEntities().getFirst();
 
         assertThat(UrlRepository.getEntities().size()).isEqualTo(1);
         assertThat(url.getName()).isEqualTo(nameExpected);
-        assertThat(url.getCreatedAt().toString()).isEqualTo(now.toString());
         assertThat(body).contains(nameExpected);
         assertThat(body).doesNotContain("/project/72");
         assertThat(response.getStatus()).isEqualTo(200);
@@ -90,11 +86,9 @@ public final class UnitTests {
 
     @Test
     public void testAddWrongUrl()  {
-        String now = new Timestamp(System.currentTimeMillis()).toString();
         HttpResponse responsePost = Unirest
                 .post(baseUrl + "/urls")
                 .field("url", Constants.URLNAMEINCORRECT)
-                .field("createdAt", now)
                 .asString();
         var body = responsePost.getBody().toString();
 
@@ -105,9 +99,8 @@ public final class UnitTests {
 
     @Test
     public void testShowCorrectIdPage() {
-        String now = new Timestamp(System.currentTimeMillis()).toString();
-
-        Unirest.post(baseUrl + "/urls").field("url", Constants.URLNAME).field("createdAt", now).asString();
+        String now = LocalTime.now().getHour() + ":" + LocalTime.now().getMinute();
+        Unirest.post(baseUrl + "/urls").field("url", Constants.URLNAME).asString();
         var response = Unirest.get(baseUrl + "/urls/1").asString();
         var body = response.getBody().toString();
 
@@ -119,9 +112,10 @@ public final class UnitTests {
 
     @Test
     public void testUrlCheckToRepository() throws SQLException {
-        var nameExpected = Constants.URLNAMECORRECT;
         var now = new Timestamp(System.currentTimeMillis());
-        UrlRepository.save(new Url("http://google.com", now));
+        Url url = new Url("http://google.com");
+        url.setCreatedAt(now);
+        UrlRepository.save(url);
         Unirest.post(baseUrl + "/urls/1/checks")
                 .field("status_code", "200")
                 .field("createdAt", now.toString())
