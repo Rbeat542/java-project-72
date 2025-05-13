@@ -32,7 +32,7 @@ public class UrlController {
     }
 
     public static void mainPage(Context ctx) {
-        var urls = UrlRepository.getEntities();
+        System.out.println("Hello world!");
         ctx.render("mainpage.jte");
     }
 
@@ -55,7 +55,6 @@ public class UrlController {
             } else {
                 name =  protocol + "://" + host;
             }
-            log.info("ATT. In UrlController the _createdAt_ variable is generated now and is " + createdAt.toString());
             processUrl(ctx, name, createdAt);
         } catch (Exception e) {
             var valError = new ValidationError<>(e.toString());
@@ -89,6 +88,9 @@ public class UrlController {
             UrlRepository.save(url);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.status(422);
+            log.info("Execution_log: In UrlController.processUrl the known id is: " + url.getId());
+            log.info("Execution_log: In UrlController.processUrl the known UrlRepo size is: "
+                    + UrlRepository.getEntities().size());
         }
         ctx.redirect(NamedRoutes.urlsPath());
     }

@@ -8,14 +8,10 @@ import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
@@ -31,20 +27,15 @@ public class UrlCheckController {
             UrlCheckRepository.save(urlCheck);
             ctx.redirect(NamedRoutes.urlPath(id));
         } catch (Exception e) {
-            log.info("Exception is :" + e);
+            log.info("Exception is: " + e);
             Thread.currentThread().interrupt();
         }
     }
 
     public static UrlCheck processCheck(String name, long urlId) throws IOException, InterruptedException {
         try {
-            Document text = Jsoup.connect(name).get();
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(name))
-                    .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+            Connection.Response response = Jsoup.connect(name).execute();
+            Document text = response.parse();
             UrlCheck urlCheck = new UrlCheck();
             urlCheck.setTitle(text.title());
             urlCheck.setH1(text.select("h1").text());
@@ -52,9 +43,15 @@ public class UrlCheckController {
             urlCheck.setUrlId(urlId);
             urlCheck.setStatusCode((long) response.statusCode());
             urlCheck.setCreatedAt(new Timestamp(System.currentTimeMillis()).toString());
+            log.info("Checking URL: " + name);
+            log.info("Response status code  = " + response.statusCode());
+            log.info("Execution_log: --UrlCheckRepository.save-- Repo size: "
+                    + UrlCheckRepository.getEntities(1L).size());
+            log.info("Execution_log: --UrlCheckRepository.save-- name: " + urlCheck.getTitle());
+            log.info("Execution_log: --UrlCheckRepository.save-- id: " + urlCheck.getId());
             return urlCheck;
         } catch (Exception e) {
-            log.info("Exception is :" + e);
+            log.info("Exception is: " + e);
             Thread.currentThread().interrupt();
             return new UrlCheck();
         }

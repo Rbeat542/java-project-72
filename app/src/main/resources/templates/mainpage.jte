@@ -1,5 +1,4 @@
 @import hexlet.code.repository.UrlRepository
-@import hexlet.code.util.NamedRoutes
 
 @template.otherpages(
 title = @`

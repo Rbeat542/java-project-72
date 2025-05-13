@@ -22,6 +22,8 @@ public class UrlRepository extends BaseRepository {
             var generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 url.setId(generatedKeys.getLong(1));
+                log.info("Execution_log: --UrlRepository.save-- saving name: " + url.getName());
+                log.info("Execution_log: --UrlRepository.save-- saving id: " + url.getId());
             } else {
                 throw new SQLException("DB have not returned an id after saving an entity");
             }
@@ -40,6 +42,9 @@ public class UrlRepository extends BaseRepository {
                 var url = new Url(name);
                 url.setCreatedAt(createdAt);
                 url.setId(id);
+                log.info("Execution_log: --UrlRepository.find-- Repo size: " + UrlRepository.getEntities().size());
+                log.info("Execution_log: --UrlRepository.find-- name: " + url.getName());
+                log.info("Execution_log: --UrlRepository.find-- id: " + url.getId());
                 return Optional.of(url);
             }
             return Optional.empty();
@@ -56,11 +61,13 @@ public class UrlRepository extends BaseRepository {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
                 var createdAt = resultSet.getTimestamp("created_At");
-                log.info("ATT. CreatedAt is " + createdAt + " from DB urls (getEntitities)");
                 var url = new Url(name);
                 url.setCreatedAt(createdAt);
                 url.setId(id);
                 result.add(url);
+                //log.info("trying to find next: ");
+                //log.info("Execution_log: --UrlRepository.getEntyties-- added name = " + url.getName());
+                //log.info("Execution_log: --UrlRepository.getEntyties-- added id = " + url.getId());
             }
             return result;
         } catch (SQLException e) {
@@ -83,7 +90,5 @@ public class UrlRepository extends BaseRepository {
                 throw new UnsupportedOperationException("Неизвестная БД: ");
             }
         }
-
     }
-
 }

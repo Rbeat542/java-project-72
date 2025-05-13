@@ -1,26 +1,22 @@
 package hexlet.code;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import io.javalin.Javalin;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.TestAbortedException;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 @Slf4j
 public final class UnitTests {
@@ -41,41 +37,23 @@ public final class UnitTests {
     }
 
     @Test
-    public void mockTest() throws IOException {
-        MockWebServer mockWebServer = new MockWebServer();
-        mockWebServer.start();
-        MockResponse mockResponse = new MockResponse()
-                .setBody("fake body")
-                .setResponseCode(200);
-        mockWebServer.enqueue(mockResponse);
-
-        String mockUrlName = mockWebServer.url("/").toString();
-        var response = Unirest.get(mockUrlName).asString();
-        var body = response.getBody().toString();
-        assertThat(body).contains("fake");
-        assertThat(body).doesNotContain(Constants.URLNAMECORRECT, Constants.URLNAMEINCORRECT);
-        assertThat(response.getStatus()).isEqualTo(200);
-        mockWebServer.shutdown();
-    }
-
-    @Test
     public void testMainEmptyPage() {
         var response = Unirest.get(baseUrl + "/").asString();
-        var body = response.getBody().toString();
+        String body = response.getBody();
         assertThat(body).contains("No urls added yet!");
-        assertThat(body).doesNotContain(Constants.URLNAMECORRECT, Constants.URLNAMEINCORRECT);
+        assertThat(body).doesNotContain(Constants.URLCORRECT, Constants.URLINCORRECT);
     }
 
     @Test
     public void testAddCorrectUrl() {
-        var nameExpected = Constants.URLNAMECORRECT;
+        var nameExpected = Constants.URLCORRECT;
         HttpResponse<String> response = Unirest
                 .post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
                 .asString();
         log.info("ATT. Response is " + response.toString());
-        var body = response.getBody().toString();
-        var url = UrlRepository.getEntities().getFirst();
+        String body = response.getBody();
+        Url url = UrlRepository.getEntities().getFirst();
 
         assertThat(UrlRepository.getEntities().size()).isEqualTo(1);
         assertThat(url.getName()).isEqualTo(nameExpected);
@@ -88,7 +66,7 @@ public final class UnitTests {
     public void testAddWrongUrl()  {
         HttpResponse responsePost = Unirest
                 .post(baseUrl + "/urls")
-                .field("url", Constants.URLNAMEINCORRECT)
+                .field("url", Constants.URLINCORRECT)
                 .asString();
         var body = responsePost.getBody().toString();
 
@@ -99,13 +77,13 @@ public final class UnitTests {
 
     @Test
     public void testShowCorrectIdPage() {
-        String now = LocalTime.now().getHour() + ":" + LocalTime.now().getMinute();
+        String currentTime = LocalTime.now().toString().substring(0, 4);
         Unirest.post(baseUrl + "/urls").field("url", Constants.URLNAME).asString();
         var response = Unirest.get(baseUrl + "/urls/1").asString();
-        var body = response.getBody().toString();
+        String body = response.getBody();
 
-        assertThat(body).contains(Constants.URLNAMECORRECT);
-        assertThat(body).contains(now);
+        assertThat(body).contains(Constants.URLCORRECT);
+        assertThat(body).contains(currentTime);
         assertThat(body).doesNotContain("/project/72");
         assertThat(response.getStatus()).isEqualTo(200);
     }
@@ -113,18 +91,13 @@ public final class UnitTests {
     @Test
     public void testUrlCheckToRepository() throws SQLException {
         var now = new Timestamp(System.currentTimeMillis());
-        Url url = new Url("http://google.com");
+        Url url = new Url(Constants.URLCORRECT);
         url.setCreatedAt(now);
         UrlRepository.save(url);
-        Unirest.post(baseUrl + "/urls/1/checks")
-                .field("status_code", "200")
-                .field("createdAt", now.toString())
-                .field("h1", "Url info")
-                .field("title", "Url page")
-                .field("url_id", "1")
-                .field("description", "Description is absent")
-                .asString();
+        UrlCheck urlCheck = new UrlCheck(200L, "Url info", "Url h1 section", "No description", 1L, now.toString());
+        UrlCheckRepository.save(urlCheck);
         assertThat(UrlCheckRepository.getEntities(1L)).isNotEmpty();
+        assertThat(UrlCheckRepository.getEntities(1L).getLast().getTitle()).isEqualTo("Url info");
     }
 
 
@@ -144,10 +117,8 @@ public final class UnitTests {
         assertThat(list.size()).isEqualTo(1);
     }
 
-
-
     @AfterAll
-    public static void afterAll() throws IOException {
+    public static void afterAll() {
         app.stop();
     }
 }

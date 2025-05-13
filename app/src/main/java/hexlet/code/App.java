@@ -1,10 +1,11 @@
 package hexlet.code;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -18,10 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
+import okhttp3.OkHttpClient;
 
 @Slf4j
 public class App {
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) throws SQLException {
         var app = getApp();
         app.start(getPort());
     }
@@ -45,7 +47,7 @@ public class App {
     public static Javalin getApp() throws SQLException {
         var hikariConfig = new HikariConfig();
         var dbUrl = getDbUrl();
-        log.info("JDBC_DATABASE_URL = " + dbUrl);
+        log.info("Execution_log: JDBC_DATABASE_URL = " + dbUrl);
         InputStream url;
         hikariConfig.setJdbcUrl(dbUrl);
         var dataSource = new HikariDataSource(hikariConfig);
@@ -69,6 +71,8 @@ public class App {
             config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
+
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         app.get(NamedRoutes.root(), UrlController::mainPage);
         app.get(NamedRoutes.urlsPath(), UrlController::index);
         app.get(NamedRoutes.build(), UrlController::build);
