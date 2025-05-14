@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -19,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
-import okhttp3.OkHttpClient;
 
 @Slf4j
 public class App {
@@ -71,8 +68,6 @@ public class App {
             config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
-
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         app.get(NamedRoutes.root(), UrlController::mainPage);
         app.get(NamedRoutes.urlsPath(), UrlController::index);
         app.get(NamedRoutes.build(), UrlController::build);
