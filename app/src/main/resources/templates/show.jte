@@ -3,10 +3,10 @@
 @import hexlet.code.util.NamedRoutes
 @param UrlPage page
 
-@template.otherpages(
+@template.allpages(
 page = page,
 title = @`
-    Web pages analyzer. Url info
+    Url analyzer. Url checks info
 `,
 content = @`
     @if(page != null)

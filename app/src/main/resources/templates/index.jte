@@ -4,10 +4,10 @@
 @import hexlet.code.repository.UrlCheckRepository
 @param UrlsPage page
 
-@template.otherpages(
+@template.allpages(
 page = page,
 title = @`
-    Web pages analyzer. Analyzed urls
+    Url analyzer. Index of urls
 `,
 content = @`
 

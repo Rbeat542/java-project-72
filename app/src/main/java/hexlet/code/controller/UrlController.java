@@ -32,13 +32,8 @@ public class UrlController {
     }
 
     public static void mainPage(Context ctx) {
-        System.out.println("Hello world!");
-        ctx.render("mainpage.jte");
-    }
-
-    public static void build(Context ctx) {
         var page = new BuildUrlPage();
-        ctx.render("build.jte", model("page", page));
+        ctx.render("mainpage.jte", model("page", page));
     }
 
     public static void create(Context ctx) throws ValidationException, URISyntaxException {
@@ -64,7 +59,7 @@ public class UrlController {
             var page = new BuildUrlPage(nameEntered, createdAt, errorsMap);
             ctx.sessionAttribute("flash", "Некорректный URL");
             page.setFlash(ctx.consumeSessionAttribute("flash"));
-            ctx.render("build.jte", model("page", page)).status(422);
+            ctx.render("mainpage.jte", model("page", page)).status(422);
         }
     }
 

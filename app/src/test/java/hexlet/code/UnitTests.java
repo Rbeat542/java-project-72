@@ -38,7 +38,7 @@ public final class UnitTests {
 
     @Test
     public void testMainEmptyPage() {
-        var response = Unirest.get(baseUrl + "/").asString();
+        var response = Unirest.get(baseUrl + "/urls").asString();
         String body = response.getBody();
         assertThat(body).contains("No urls added yet!");
         assertThat(body).doesNotContain(Constants.URLCORRECT, Constants.URLINCORRECT);
