@@ -14,4 +14,4 @@ COPY config config
 
 RUN ./gradlew --no-daemon installDist
 
-CMD ./build/install/App/bin/app
+CMD ./build/install/app/bin/app
