@@ -44,6 +44,10 @@ public final class ControllersTests {
         String body = response.getBody();
         assertThat(body).contains("No urls added yet!");
         assertThat(body).doesNotContain(Constants.URLCORRECT, Constants.URLINCORRECT);
+
+        response = Unirest.get(baseUrl).asString();
+        body = response.getBody();
+        assertThat(body).contains("Url analyzer. Main page");
     }
 
     @Test
