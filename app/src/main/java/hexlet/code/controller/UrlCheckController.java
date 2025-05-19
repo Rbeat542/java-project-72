@@ -33,7 +33,7 @@ public class UrlCheckController {
             ctx.redirect(NamedRoutes.urlPath(id));
         } catch (Exception e) {
             log.info("Exception is: " + e);
-            //Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt();
             var valError = new ValidationError<>(e.toString());
             var list = List.of(valError);
             var errorsMap = new HashMap<String, List<ValidationError<Object>>>();

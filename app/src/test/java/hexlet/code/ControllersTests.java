@@ -19,6 +19,7 @@ import java.time.LocalTime;
 
 import static hexlet.code.App.getApp;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 
 @Slf4j
 public final class ControllersTests {
