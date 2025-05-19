@@ -62,6 +62,15 @@ public final class ControllersTests {
         assertThat(body).contains(nameExpected);
         assertThat(body).doesNotContain("/project/72");
         assertThat(response.getStatus()).isEqualTo(200);
+
+        var repeatedResponse = Unirest
+                .post(baseUrl + "/urls")
+                .field("url", Constants.URLNAME)
+                .asString();
+        log.info("ATT. Response is " + response.toString());
+        body = repeatedResponse.getBody();
+        assertThat(body).contains("Страница уже существует");
+        assertThat(UrlRepository.getEntities().size()).isEqualTo(1);
     }
 
     @Test
