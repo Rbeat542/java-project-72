@@ -16,16 +16,18 @@ import org.opentest4j.TestAbortedException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalTime;
+
+import static hexlet.code.App.getApp;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-public final class UnitTests {
+public final class ControllersTests {
     private static Javalin app;
     private static String baseUrl;
 
     @BeforeAll
     public static void beforeAll() throws SQLException, TestAbortedException {
-        app = hexlet.code.App.getApp();
+        app = getApp();
         app.start(7070);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
@@ -53,10 +55,10 @@ public final class UnitTests {
                 .asString();
         log.info("ATT. Response is " + response.toString());
         String body = response.getBody();
-        Url url = UrlRepository.getEntities().getFirst();
+        var urls = UrlRepository.getEntities();
 
-        assertThat(UrlRepository.getEntities().size()).isEqualTo(1);
-        assertThat(url.getName()).isEqualTo(nameExpected);
+        assertThat(urls.size()).isEqualTo(1);
+        assertThat(urls.getFirst().getName()).isEqualTo(nameExpected);
         assertThat(body).contains(nameExpected);
         assertThat(body).doesNotContain("/project/72");
         assertThat(response.getStatus()).isEqualTo(200);
@@ -92,9 +94,9 @@ public final class UnitTests {
     public void testUrlCheckToRepository() throws SQLException {
         var now = new Timestamp(System.currentTimeMillis());
         Url url = new Url(Constants.URLCORRECT);
-        url.setCreatedAt(now);
         UrlRepository.save(url);
-        UrlCheck urlCheck = new UrlCheck(200L, "Url info", "Url h1 section", "No description", 1L, now.toString());
+        Long id = UrlRepository.getEntities().getLast().getId();
+        UrlCheck urlCheck = new UrlCheck(200L, "Url info", "Url h1 section", "No description", id, now.toString());
         UrlCheckRepository.save(urlCheck);
         assertThat(UrlCheckRepository.getEntities(1L)).isNotEmpty();
         assertThat(UrlCheckRepository.getEntities(1L).getLast().getTitle()).isEqualTo("Url info");

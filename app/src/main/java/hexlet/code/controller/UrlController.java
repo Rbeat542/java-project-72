@@ -67,7 +67,7 @@ public class UrlController {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
-        var page = new UrlPage(url);
+        var page = new UrlPage(url, null);
         ctx.render("show.jte", model("page", page));
     }
 

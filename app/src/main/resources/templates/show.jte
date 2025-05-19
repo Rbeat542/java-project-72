@@ -9,6 +9,13 @@ title = @`
     Url analyzer. Url checks info
 `,
 content = @`
+    @if(page != null && page.getErrors() != null)
+        @if(page.getFlash() != null)
+            <div class="alert alert-danger" role="alert">
+                ${page.getFlash()}
+            </div>
+        @endif
+    @endif
     @if(page != null)
         <br>
         <h3>Url information:</h3>

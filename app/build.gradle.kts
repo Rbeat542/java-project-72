@@ -2,7 +2,6 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    id("java")
     id("org.sonarqube") version "6.0.1.5171"
     id("io.freefair.lombok") version "8.13.1"
     id("com.github.johnrengelman.shadow") version "8.1.1"

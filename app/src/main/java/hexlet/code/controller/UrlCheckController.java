@@ -1,11 +1,13 @@
 package hexlet.code.controller;
 
+import hexlet.code.model.UrlPage;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
+import io.javalin.validation.ValidationError;
 import io.javalin.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
@@ -14,6 +16,10 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+
+import static io.javalin.rendering.template.TemplateUtil.model;
 
 @Slf4j
 public class UrlCheckController {
@@ -21,14 +27,22 @@ public class UrlCheckController {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
-        String name = url.getName();
         try {
-            var urlCheck = processCheck(name, id);
+            var urlCheck = processCheck(url.getName(), id);
             UrlCheckRepository.save(urlCheck);
             ctx.redirect(NamedRoutes.urlPath(id));
         } catch (Exception e) {
             log.info("Exception is: " + e);
-            Thread.currentThread().interrupt();
+            //Thread.currentThread().interrupt();
+            var valError = new ValidationError<>(e.toString());
+            var list = List.of(valError);
+            var errorsMap = new HashMap<String, List<ValidationError<Object>>>();
+            errorsMap.put("some", list);
+            var page = new UrlPage(url, errorsMap);
+            ctx.sessionAttribute("flash", "Некорректный URL");
+            page.setFlash(ctx.consumeSessionAttribute("flash"));
+            ctx.render("show.jte", model("page", page)).status(422);
+
         }
     }
 
