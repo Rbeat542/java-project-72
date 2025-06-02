@@ -87,7 +87,7 @@ public class UrlRepository extends BaseRepository {
                 stmt.execute("ALTER SEQUENCE url_checks_id_seq RESTART WITH 1");
                 stmt.execute("ALTER SEQUENCE urls_id_seq RESTART WITH 1");
             } else {
-                System.out.println("Очистка баз данных не выполнена");
+                System.out.println("Очистка таблиц БД не рассчитана на базу данных " + dbUrl);
             }
         }
     }

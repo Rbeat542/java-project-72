@@ -25,7 +25,7 @@ public class App {
         app.start(getPort());
     }
 
-    private static int getPort() {
+    public static int getPort() {
         String port = System.getenv().getOrDefault("PORT", "7070");
         return Integer.parseInt(port);
     }

@@ -12,11 +12,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.opentest4j.TestAbortedException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalTime;
-
 import static hexlet.code.App.getApp;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,11 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class ControllersTests {
     private static Javalin app;
     private static String baseUrl;
+    private static UrlRepository urlRepository;
 
     @BeforeAll
     public static void beforeAll() throws SQLException, TestAbortedException {
         app = getApp();
-        app.start(7070);
+        app.start(App.getPort());
         int port = app.port();
         baseUrl = "http://localhost:" + port;
     }
@@ -36,6 +37,13 @@ public final class ControllersTests {
     @BeforeEach
     public void beforeEach() throws SQLException {
         UrlRepository.clear();
+    }
+
+    @Test
+    public void testPort() {
+        var port = System.getenv().get("PORT");
+        assertThat(null == port || 7070 == Integer.parseInt(port));
+
     }
 
     @Test
@@ -121,7 +129,7 @@ public final class ControllersTests {
         String now = new Timestamp(System.currentTimeMillis()).toString();
         Unirest.post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
-                .field("createdAt", now)
+                .field("createdAt", "99999")
                 .asString();
         HttpResponse response = Unirest
                 .get(baseUrl + "/urls/2")
