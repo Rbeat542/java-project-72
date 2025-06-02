@@ -2,8 +2,9 @@ package hexlet.code.controller;
 
 import hexlet.code.dto.BuildUrlPage;
 import hexlet.code.model.Url;
-import hexlet.code.model.UrlPage;
-import hexlet.code.model.UrlsPage;
+import hexlet.code.dto.UrlPage;
+import hexlet.code.dto.UrlsPage;
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
@@ -24,9 +25,10 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 @Slf4j
 public class UrlController {
 
-    public static void index(Context ctx) {
+    public static void index(Context ctx) throws SQLException {
         var urls = UrlRepository.getEntities();
-        var page = new UrlsPage(urls);
+        var statuses = UrlCheckRepository.getLastStatuses();
+        var page = new UrlsPage(urls, statuses);
         page.setFlash(ctx.consumeSessionAttribute("flash"));
         ctx.render("index.jte", model("page", page));
     }
@@ -38,7 +40,6 @@ public class UrlController {
 
     public static void create(Context ctx) throws ValidationException, URISyntaxException {
         String nameEntered = ctx.formParam("url");
-        Timestamp createdAt = new Timestamp(System.currentTimeMillis());
         String name = "";
         try {
             var urlChecked = new URI(nameEntered).toURL();
@@ -50,13 +51,13 @@ public class UrlController {
             } else {
                 name =  protocol + "://" + host;
             }
-            processUrl(ctx, name, createdAt);
+            processUrl(ctx, name);
         } catch (Exception e) {
             var valError = new ValidationError<>(e.toString());
             var list = List.of(valError);
             var errorsMap = new HashMap<String, List<ValidationError<Object>>>();
             errorsMap.put("some", list);
-            var page = new BuildUrlPage(nameEntered, createdAt, errorsMap);
+            var page = new BuildUrlPage(nameEntered, errorsMap);
             ctx.sessionAttribute("flash", "Некорректный URL");
             page.setFlash(ctx.consumeSessionAttribute("flash"));
             ctx.render("mainpage.jte", model("page", page)).status(422);
@@ -67,11 +68,12 @@ public class UrlController {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
-        var page = new UrlPage(url, null);
+        var list = UrlCheckRepository.getEntities(id);
+        var page = new UrlPage(url, list, null);
         ctx.render("show.jte", model("page", page));
     }
 
-    public static void processUrl(Context ctx, String name, Timestamp createdAt) throws SQLException {
+    public static void processUrl(Context ctx, String name) throws SQLException {
         var urls = UrlRepository.getEntities();
         var isAlreadyExists = urls.stream()
                 .anyMatch(url -> url.getName().equals(name));
@@ -79,7 +81,7 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Страница уже существует");
         } else {
             var url = new Url(name);
-            url.setCreatedAt(createdAt);
+            url.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             UrlRepository.save(url);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.status(422);

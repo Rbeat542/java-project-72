@@ -1,10 +1,13 @@
 package hexlet.code.repository;
-import hexlet.code.model.UrlCheck;
+import hexlet.code.dto.UrlCheck;
+
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
@@ -29,7 +32,7 @@ public class UrlCheckRepository extends BaseRepository {
     }
 
     public static List<UrlCheck> getEntities(Long url) {
-        var sql = "SELECT * FROM url_checks WHERE url_id=?";
+        var sql = "SELECT * FROM url_checks WHERE url_id=? ORDER BY id ASC";
         try (var conn = dataSource.getConnection(); var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, url);
             var resultSet = stmt.executeQuery();
@@ -55,6 +58,29 @@ public class UrlCheckRepository extends BaseRepository {
         } catch (SQLException e) {
             return new ArrayList<>();
         }
+    }
+
+    public static Map<Long, Long> getLastStatuses() throws SQLException {
+        var sql = "SELECT DISTINCT ON (url_id) url_id, created_at, status_code FROM url_checks ORDER BY "
+                + "url_id, created_at DESC";
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            var resultSet = stmt.executeQuery();
+            var result = new HashMap<Long, Long>();
+            Long rowCount = 0L;
+            while (resultSet.next()) {
+                rowCount++;
+                var urlId = resultSet.getLong("url_id");
+                var statusCode = resultSet.getLong("status_code");
+                result.put(urlId, statusCode);
+            }
+            if (result == null || result.isEmpty()) {
+                return new HashMap<Long, Long>();
+            }
+            return result;
+        } /*throw (SQLException e) {
+            System.out.println(e); // !!!
+        }*/
     }
 
 }

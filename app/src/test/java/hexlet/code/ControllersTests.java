@@ -1,7 +1,7 @@
 package hexlet.code;
 
 import hexlet.code.model.Url;
-import hexlet.code.model.UrlCheck;
+import hexlet.code.dto.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import io.javalin.Javalin;
@@ -57,7 +57,7 @@ public final class ControllersTests {
                 .post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
                 .asString();
-        log.info("ATT. Response is " + response.toString());
+        log.info("LOGGING. Response is " + response.toString());
         String body = response.getBody();
         var urls = UrlRepository.getEntities();
 
@@ -71,7 +71,7 @@ public final class ControllersTests {
                 .post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
                 .asString();
-        log.info("ATT. Response is " + response.toString());
+        log.info("LOGGING. Response is " + response.toString());
         body = repeatedResponse.getBody();
         assertThat(body).contains("Страница уже существует");
         assertThat(UrlRepository.getEntities().size()).isEqualTo(1);

@@ -36,7 +36,6 @@
     </div>
 </nav>
 
-<!-- Основная разметка страницы -->
 <div class="content">
     ${content}
 </div>

@@ -22,8 +22,8 @@ public class UrlRepository extends BaseRepository {
             var generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 url.setId(generatedKeys.getLong(1));
-                log.info("Execution_log: --UrlRepository.save-- saving name: " + url.getName());
-                log.info("Execution_log: --UrlRepository.save-- saving id: " + url.getId());
+                log.info("LOGGING: UrlRepository.save saving name: " + url.getName());
+                log.info("LOGGING: UrlRepository.save saving id: " + url.getId());
             } else {
                 throw new SQLException("DB have not returned an id after saving an entity");
             }
@@ -42,9 +42,9 @@ public class UrlRepository extends BaseRepository {
                 var url = new Url(name);
                 url.setCreatedAt(createdAt);
                 url.setId(id);
-                log.info("Execution_log: --UrlRepository.find-- Repo size: " + UrlRepository.getEntities().size());
-                log.info("Execution_log: --UrlRepository.find-- name: " + url.getName());
-                log.info("Execution_log: --UrlRepository.find-- id: " + url.getId());
+                log.info("LOGGING: UrlRepository.find Repo size: " + UrlRepository.getEntities().size());
+                log.info("LOGGING: UrlRepository.find name: " + url.getName());
+                log.info("LOGGING: UrlRepository.find id: " + url.getId());
                 return Optional.of(url);
             }
             return Optional.empty();
@@ -52,7 +52,7 @@ public class UrlRepository extends BaseRepository {
     }
 
     public static List<Url> getEntities()  {
-        var sql = "SELECT * FROM urls";
+        var sql = "SELECT * FROM urls ORDER BY id DESC";  //OK
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
@@ -65,9 +65,8 @@ public class UrlRepository extends BaseRepository {
                 url.setCreatedAt(createdAt);
                 url.setId(id);
                 result.add(url);
-                //log.info("trying to find next: ");
-                //log.info("Execution_log: --UrlRepository.getEntyties-- added name = " + url.getName());
-                //log.info("Execution_log: --UrlRepository.getEntyties-- added id = " + url.getId());
+                log.info("LOGGING: UrlRepository.getEntyties added name = " + url.getName());
+                log.info("LOGGING: UrlRepository.getEntyties added id = " + url.getId());
             }
             return result;
         } catch (SQLException e) {
@@ -77,17 +76,18 @@ public class UrlRepository extends BaseRepository {
 
     public static void clear() throws SQLException {
         try (var conn = dataSource.getConnection();
-             var stmt = conn.createStatement()) {
+            var stmt = conn.createStatement()) {
             var dbUrl = getDbUrl();
+            stmt.executeUpdate("DELETE FROM url_checks");
+            stmt.executeUpdate("DELETE FROM urls");
             if (dbUrl.contains("h2")) {
-                stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
-                stmt.execute("TRUNCATE TABLE url_checks RESTART IDENTITY");
-                stmt.execute("TRUNCATE TABLE urls RESTART IDENTITY");
-                stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
-            } else  if (dbUrl.contains("postgresql")) {
-                stmt.execute("TRUNCATE TABLE url_checks, urls RESTART IDENTITY CASCADE");
+                stmt.execute("ALTER TABLE url_checks ALTER COLUMN id RESTART WITH 1");
+                stmt.execute("ALTER TABLE urls ALTER COLUMN id RESTART WITH 1");
+            } else if (dbUrl.contains("postgresql")) {
+                stmt.execute("ALTER SEQUENCE url_checks_id_seq RESTART WITH 1");
+                stmt.execute("ALTER SEQUENCE urls_id_seq RESTART WITH 1");
             } else {
-                throw new UnsupportedOperationException("Неизвестная БД: ");
+                System.out.println("Очистка баз данных не выполнена");
             }
         }
     }

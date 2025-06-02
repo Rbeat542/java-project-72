@@ -1,7 +1,5 @@
-@import hexlet.code.model.UrlsPage
+@import hexlet.code.dto.UrlsPage
 @import hexlet.code.util.NamedRoutes
-@import hexlet.code.repository.UrlRepository
-@import hexlet.code.repository.UrlCheckRepository
 @param UrlsPage page
 
 @template.allpages(
@@ -22,7 +20,7 @@ content = @`
         </div>
     @endif
 
-    @if(UrlRepository.getEntities().isEmpty())
+    @if(page.getUrls().isEmpty())
         <br>
         <p>No urls added yet!</p>
     @else
@@ -39,16 +37,14 @@ content = @`
             </tr>
             </thead>
             <tbody>
-        @for(var url : UrlRepository.getEntities())
+        @for(var url : page.getUrls())
             <tr>
                 <th>${url.getId()}</th>
                 <th><a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a></th>
-                @if(!UrlCheckRepository.getEntities(url.getId()).isEmpty())
-                    !{var list = UrlCheckRepository.getEntities(url.getId());}
-                    <th>${list.getLast().getCreatedAt()}</th>
-                    <th>${list.getLast().getStatusCode()}</th>
+                <th>${url.getCreatedAt().toString()}</th>
+                @if(page.getLastStatuses().containsKey(url.getId()))
+                    <th>${page.getLastStatuses().get(url.getId())}</th>
                 @else
-                    <th></th>
                     <th></th>
                 @endif
             </tr>

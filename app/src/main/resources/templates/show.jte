@@ -1,4 +1,4 @@
-@import hexlet.code.model.UrlPage
+@import hexlet.code.dto.UrlPage
 @import hexlet.code.repository.UrlCheckRepository
 @import hexlet.code.util.NamedRoutes
 @param UrlPage page
@@ -66,16 +66,15 @@ content = @`
         </tr>
         </thead>
         <tbody>
-        !{var list = UrlCheckRepository.getEntities(page.getUrl().getId());}
-        @if(!list.isEmpty())
-            @for(int i = list.size() - 1; i >= 0; i--)
+        @if(!page.getList().isEmpty())
+            @for(int i = page.getList().size() - 1; i >= 0; i--)
                 <tr>
-                    <th>${list.get(i).getId()}</th>
-                    <th>${list.get(i).getStatusCode()}</th>
-                    <th>${list.get(i).getTitle()}</th>
-                    <th>${list.get(i).getH1()}</th>
-                    <th>${list.get(i).getDescription()}</th>
-                    <th>${list.get(i).getCreatedAt().toString()}</th>
+                    <th>${page.getList().get(i).getId()}</th>
+                    <th>${page.getList().get(i).getStatusCode()}</th>
+                    <th>${page.getList().get(i).getTitle()}</th>
+                    <th>${page.getList().get(i).getH1()}</th>
+                    <th>${page.getList().get(i).getDescription()}</th>
+                    <th>${page.getList().get(i).getCreatedAt().toString()}</th>
                 </tr>
             @endfor
         @endif

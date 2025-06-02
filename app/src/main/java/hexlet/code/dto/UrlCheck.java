@@ -1,9 +1,11 @@
-package hexlet.code.model;
+package hexlet.code.dto;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @NoArgsConstructor
+@Getter
 @Setter
 public final class UrlCheck {
     private Long id;
@@ -13,34 +15,6 @@ public final class UrlCheck {
     private String description;
     private Long urlId;
     private String createdAt;
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getStatusCode() {
-        return statusCode;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getH1() {
-        return h1;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Long getUrlId() {
-        return urlId;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
 
     public UrlCheck(Long statusCode, String title, String h1, String description, Long urlId, String createdAt) {
         this.statusCode = statusCode;

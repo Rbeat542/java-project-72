@@ -1,7 +1,7 @@
 package hexlet.code.controller;
 
-import hexlet.code.model.UrlPage;
-import hexlet.code.model.UrlCheck;
+import hexlet.code.dto.UrlPage;
+import hexlet.code.dto.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.NamedRoutes;
@@ -35,10 +35,11 @@ public class UrlCheckController {
             log.info("Exception is: " + e);
             Thread.currentThread().interrupt();
             var valError = new ValidationError<>(e.toString());
-            var list = List.of(valError);
+            var listOfErrors = List.of(valError);
             var errorsMap = new HashMap<String, List<ValidationError<Object>>>();
-            errorsMap.put("some", list);
-            var page = new UrlPage(url, errorsMap);
+            errorsMap.put("some", listOfErrors);
+            var list = UrlCheckRepository.getEntities(id);
+            var page = new UrlPage(url, list, errorsMap);
             ctx.sessionAttribute("flash", "Некорректный URL");
             page.setFlash(ctx.consumeSessionAttribute("flash"));
             ctx.render("show.jte", model("page", page)).status(422);
@@ -59,10 +60,10 @@ public class UrlCheckController {
             urlCheck.setCreatedAt(new Timestamp(System.currentTimeMillis()).toString());
             log.info("Checking URL: " + name);
             log.info("Response status code  = " + response.statusCode());
-            log.info("Execution_log: --UrlCheckRepository.save-- Repo size: "
+            log.info("LOGGING: UrlCheckRepository.save Repo size: "
                     + UrlCheckRepository.getEntities(1L).size());
-            log.info("Execution_log: --UrlCheckRepository.save-- name: " + urlCheck.getTitle());
-            log.info("Execution_log: --UrlCheckRepository.save-- id: " + urlCheck.getId());
+            log.info("LOGGING: UrlCheckRepository.save name: " + urlCheck.getTitle());
+            log.info("LOGGING: UrlCheckRepository.save id: " + urlCheck.getId());
             return urlCheck;
         } catch (Exception e) {
             log.info("Exception is: " + e);
