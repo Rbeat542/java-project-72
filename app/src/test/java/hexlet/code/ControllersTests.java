@@ -8,12 +8,11 @@ import io.javalin.Javalin;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.TestAbortedException;
-
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalTime;
@@ -143,6 +142,23 @@ public final class ControllersTests {
         assertThat(response.getStatus()).isEqualTo(404);
         assertThat(statuses).isEmpty();
         assertThat(list.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void testLastStatuses() throws SQLException {
+        Url url = new Url(Constants.URLCORRECT);
+        url.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        UrlRepository.save(url);
+        var now = new Timestamp(System.currentTimeMillis()).toString();
+        Unirest.post(baseUrl + "/urls/1/checks")
+                .field("title", "Title")
+                .field("h1", "some H1")
+                .asString();
+
+        var statuses = UrlCheckRepository.getLastStatuses();
+
+        assertThat(statuses).isNotEmpty();
+        assertThat(statuses.size()).isEqualTo(1);
     }
 
     @AfterAll
