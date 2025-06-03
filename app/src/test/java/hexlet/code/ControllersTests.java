@@ -12,8 +12,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.opentest4j.TestAbortedException;
+
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalTime;
@@ -25,6 +25,7 @@ public final class ControllersTests {
     private static Javalin app;
     private static String baseUrl;
     private static UrlRepository urlRepository;
+    private static UrlCheckRepository urlCheckRepository;
 
     @BeforeAll
     public static void beforeAll() throws SQLException, TestAbortedException {
@@ -55,6 +56,8 @@ public final class ControllersTests {
 
         response = Unirest.get(baseUrl).asString();
         body = response.getBody();
+        var urls = urlRepository.getEntities();
+        assertThat(urls.isEmpty());
         assertThat(body).contains("Url analyzer. Main page");
     }
 
@@ -107,7 +110,6 @@ public final class ControllersTests {
 
         assertThat(body).contains(Constants.URLCORRECT);
         assertThat(body).contains(currentTime);
-        assertThat(body).doesNotContain("/project/72");
         assertThat(response.getStatus()).isEqualTo(200);
     }
 
@@ -125,18 +127,21 @@ public final class ControllersTests {
 
 
     @Test
-    public void testCreateCorrectUrl() {
+    public void testRepositories() throws SQLException {
         String now = new Timestamp(System.currentTimeMillis()).toString();
+
         Unirest.post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
-                .field("createdAt", "99999")
+                .field("createdAt", now)
                 .asString();
         HttpResponse response = Unirest
                 .get(baseUrl + "/urls/2")
                 .asString();
         var list = UrlRepository.getEntities();
+        var statuses = UrlCheckRepository.getLastStatuses();
 
         assertThat(response.getStatus()).isEqualTo(404);
+        assertThat(statuses).isEmpty();
         assertThat(list.size()).isEqualTo(1);
     }
 

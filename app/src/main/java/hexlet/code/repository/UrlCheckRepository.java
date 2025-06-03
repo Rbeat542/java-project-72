@@ -64,7 +64,7 @@ public class UrlCheckRepository extends BaseRepository {
         var sql = "SELECT DISTINCT ON (url_id) url_id, created_at, status_code FROM url_checks ORDER BY "
                 + "url_id, created_at DESC";
         try (var conn = dataSource.getConnection();
-             var stmt = conn.prepareStatement(sql)) {
+            var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
             var result = new HashMap<Long, Long>();
             Long rowCount = 0L;
@@ -78,9 +78,7 @@ public class UrlCheckRepository extends BaseRepository {
                 return new HashMap<Long, Long>();
             }
             return result;
-        } /*throw (SQLException e) {
-            System.out.println(e); // !!!
-        }*/
+        }
     }
 
 }
