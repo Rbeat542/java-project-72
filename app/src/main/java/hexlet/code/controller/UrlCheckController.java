@@ -23,7 +23,7 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 
 @Slf4j
 public class UrlCheckController {
-    public static void check(Context ctx) throws ValidationException, SQLException {
+    public static void check(Context ctx) throws ValidationException, SQLException, InterruptedException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
