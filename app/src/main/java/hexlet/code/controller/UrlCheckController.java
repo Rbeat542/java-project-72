@@ -32,6 +32,10 @@ public class UrlCheckController {
             UrlCheckRepository.save(urlCheck);
             ctx.redirect(NamedRoutes.urlPath(id));
         } catch (Exception e) {
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+                throw (InterruptedException) e;
+            }
             log.info("Exception is: " + e);
             var valError = new ValidationError<>(e.toString());
             var listOfErrors = List.of(valError);
