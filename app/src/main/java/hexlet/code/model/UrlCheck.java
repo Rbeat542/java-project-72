@@ -1,8 +1,10 @@
-package hexlet.code.dto;
+package hexlet.code.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.Instant;
 
 @NoArgsConstructor
 @Getter
@@ -14,14 +16,13 @@ public final class UrlCheck {
     private String h1;
     private String description;
     private Long urlId;
-    private String createdAt;
+    private Instant createdAt;
 
-    public UrlCheck(Long statusCode, String title, String h1, String description, Long urlId, String createdAt) {
+    public UrlCheck(Long statusCode, String title, String h1, String description, Long urlId) {
         this.statusCode = statusCode;
         this.title = title;
         this.h1 = h1;
         this.description = description;
         this.urlId = urlId;
-        this.createdAt = createdAt;
     }
 }

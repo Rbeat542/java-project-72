@@ -1,6 +1,6 @@
 package hexlet.code.repository;
-import hexlet.code.dto.UrlCheck;
 
+import hexlet.code.model.UrlCheck;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -46,9 +46,10 @@ public class UrlCheckRepository extends BaseRepository {
                 var h1 = resultSet.getString("h1");
                 var description = resultSet.getString("description");
                 var urlId = resultSet.getLong("url_id");
-                var createdAt = resultSet.getString("created_at");
-                var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
+                var createdAt = resultSet.getTimestamp("created_at");
+                var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId);
                 urlCheck.setId(id);
+                urlCheck.setCreatedAt(createdAt.toInstant());
                 result.add(urlCheck);
             }
             if (result == null || result.isEmpty()) {

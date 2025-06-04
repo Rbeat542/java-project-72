@@ -1,7 +1,7 @@
 package hexlet.code.controller;
 
 import hexlet.code.dto.UrlPage;
-import hexlet.code.dto.UrlCheck;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.NamedRoutes;
@@ -15,7 +15,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,7 +33,6 @@ public class UrlCheckController {
             ctx.redirect(NamedRoutes.urlPath(id));
         } catch (Exception e) {
             log.info("Exception is: " + e);
-            Thread.currentThread().interrupt();
             var valError = new ValidationError<>(e.toString());
             var listOfErrors = List.of(valError);
             var errorsMap = new HashMap<String, List<ValidationError<Object>>>();
@@ -43,32 +42,23 @@ public class UrlCheckController {
             ctx.sessionAttribute("flash", "Некорректный URL");
             page.setFlash(ctx.consumeSessionAttribute("flash"));
             ctx.render("show.jte", model("page", page)).status(422);
-
         }
     }
 
     public static UrlCheck processCheck(String name, long urlId) throws IOException, InterruptedException {
-        try {
-            Connection.Response response = Jsoup.connect(name).execute();
-            Document text = response.parse();
-            UrlCheck urlCheck = new UrlCheck();
-            urlCheck.setTitle(text.title());
-            urlCheck.setH1(text.select("h1").text());
-            urlCheck.setDescription(text.select("meta[name=description]").attr("content"));
-            urlCheck.setUrlId(urlId);
-            urlCheck.setStatusCode((long) response.statusCode());
-            urlCheck.setCreatedAt(new Timestamp(System.currentTimeMillis()).toString());
-            log.info("Checking URL: " + name);
-            log.info("Response status code  = " + response.statusCode());
-            log.info("LOGGING: UrlCheckRepository.save Repo size: "
-                    + UrlCheckRepository.getEntities(1L).size());
-            log.info("LOGGING: UrlCheckRepository.save name: " + urlCheck.getTitle());
-            log.info("LOGGING: UrlCheckRepository.save id: " + urlCheck.getId());
-            return urlCheck;
-        } catch (Exception e) {
-            log.info("Exception is: " + e);
-            Thread.currentThread().interrupt();
-            return new UrlCheck();
-        }
+        Connection.Response response = Jsoup.connect(name).execute();
+        Document text = response.parse();
+        UrlCheck urlCheck = new UrlCheck();
+        urlCheck.setTitle(text.title());
+        urlCheck.setH1(text.select("h1").text());
+        urlCheck.setDescription(text.select("meta[name=description]").attr("content"));
+        urlCheck.setUrlId(urlId);
+        urlCheck.setStatusCode((long) response.statusCode());
+        urlCheck.setCreatedAt(Instant.now());
+        log.info("Checking URL: " + name);
+        log.info("Response status code  = " + response.statusCode());
+        log.info("LOGGING: UrlCheckRepository.save name: " + urlCheck.getTitle());
+        log.info("LOGGING: UrlCheckRepository.save id: " + urlCheck.getId());
+        return urlCheck;
     }
 }

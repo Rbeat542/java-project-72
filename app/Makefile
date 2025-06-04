@@ -27,5 +27,3 @@ lint:
 	./gradlew checkstyleMain
 
 build-run: build run
-
-.PHONY: build

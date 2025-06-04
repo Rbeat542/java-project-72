@@ -15,8 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.HashMap;
 
@@ -43,15 +44,7 @@ public class UrlController {
         String name = "";
         try {
             var urlChecked = new URI(nameEntered).toURL();
-            var protocol = urlChecked.getProtocol();
-            var host = urlChecked.getHost();
-            var port = urlChecked.getPort();
-            if (port != -1) {
-                name =  protocol + "://" + host + ":" + port;
-            } else {
-                name =  protocol + "://" + host;
-            }
-            processUrl(ctx, name);
+            processUrl(ctx, urlChecked);
         } catch (Exception e) {
             var valError = new ValidationError<>(e.toString());
             var list = List.of(valError);
@@ -73,21 +66,26 @@ public class UrlController {
         ctx.render("show.jte", model("page", page));
     }
 
-    public static void processUrl(Context ctx, String name) throws SQLException {
-        var urls = UrlRepository.getEntities();
-        var isAlreadyExists = urls.stream()
-                .anyMatch(url -> url.getName().equals(name));
-        if (isAlreadyExists) {
+    public static void processUrl(Context ctx, URL inputUrl) throws SQLException {
+        String name;
+        var protocol = inputUrl.getProtocol();
+        var host = inputUrl.getHost();
+        var port = inputUrl.getPort();
+        if (port != -1) {
+            name = protocol + "://" + host + ":" + port;
+        } else {
+            name = protocol + "://" + host;
+        }
+        var urlFound = UrlRepository.findName(name);
+        if (urlFound.isPresent()) {
             ctx.sessionAttribute("flash", "Страница уже существует");
         } else {
             var url = new Url(name);
-            url.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            url.setCreatedAt(Instant.now());
             UrlRepository.save(url);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.status(422);
             log.info("Execution_log: In UrlController.processUrl the known id is: " + url.getId());
-            log.info("Execution_log: In UrlController.processUrl the known UrlRepo size is: "
-                    + UrlRepository.getEntities().size());
         }
         ctx.redirect(NamedRoutes.urlsPath());
     }

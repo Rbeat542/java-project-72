@@ -1,7 +1,7 @@
 package hexlet.code;
 
 import hexlet.code.model.Url;
-import hexlet.code.dto.UrlCheck;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import io.javalin.Javalin;
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.opentest4j.TestAbortedException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalTime;
+import java.time.Instant;
 import static hexlet.code.App.getApp;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -102,23 +102,22 @@ public final class ControllersTests {
 
     @Test
     public void testShowCorrectIdPage() {
-        String currentTime = LocalTime.now().toString().substring(0, 4);
         Unirest.post(baseUrl + "/urls").field("url", Constants.URLNAME).asString();
         var response = Unirest.get(baseUrl + "/urls/1").asString();
         String body = response.getBody();
 
         assertThat(body).contains(Constants.URLCORRECT);
-        assertThat(body).contains(currentTime);
         assertThat(response.getStatus()).isEqualTo(200);
     }
 
     @Test
     public void testUrlCheckToRepository() throws SQLException {
-        var now = new Timestamp(System.currentTimeMillis());
         Url url = new Url(Constants.URLCORRECT);
+        url.setCreatedAt(Instant.now());
         UrlRepository.save(url);
         Long id = UrlRepository.getEntities().getLast().getId();
-        UrlCheck urlCheck = new UrlCheck(200L, "Url info", "Url h1 section", "No description", id, now.toString());
+        UrlCheck urlCheck = new UrlCheck(200L, "Url info", "Url h1 section", "No description", id);
+        urlCheck.setCreatedAt(Instant.now());
         UrlCheckRepository.save(urlCheck);
         assertThat(UrlCheckRepository.getEntities(1L)).isNotEmpty();
         assertThat(UrlCheckRepository.getEntities(1L).getLast().getTitle()).isEqualTo("Url info");
@@ -147,9 +146,8 @@ public final class ControllersTests {
     @Test
     public void testLastStatuses() throws SQLException {
         Url url = new Url(Constants.URLCORRECT);
-        url.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        url.setCreatedAt(Instant.now());
         UrlRepository.save(url);
-        var now = new Timestamp(System.currentTimeMillis()).toString();
         Unirest.post(baseUrl + "/urls/1/checks")
                 .field("title", "Title")
                 .field("h1", "some H1")

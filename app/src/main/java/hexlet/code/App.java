@@ -50,8 +50,11 @@ public class App {
         var dataSource = new HikariDataSource(hikariConfig);
         if (dbUrl.contains("jdbc:h2")) {
             url = App.class.getClassLoader().getResourceAsStream("schema.sql");
-        } else {
+        } else if (dbUrl.contains("postgres")) {
             url = App.class.getClassLoader().getResourceAsStream("schemaPg.sql");
+        } else {
+            throw new UnsupportedOperationException(
+            "Ошибка. Поддерживаются только базы данных H2 и PostgreSQL");
         }
         var sql = new BufferedReader(new InputStreamReader(url))
                 .lines().collect(Collectors.joining("\n"));
