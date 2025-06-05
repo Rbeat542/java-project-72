@@ -38,13 +38,15 @@ content = @`
             </thead>
             <tbody>
         @for(var url : page.getUrls())
+            !{var check = page.getLastStatuses().get(url.getId()); }
             <tr>
                 <th>${url.getId()}</th>
                 <th><a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a></th>
-                <th>${url.getCreatedAt().toString()}</th>
-                @if(page.getLastStatuses().containsKey(url.getId()))
-                    <th>${page.getLastStatuses().get(url.getId())}</th>
+                @if(check != null)
+                    <th>${check.getStatus()}</th>
+                    <th>${check.getCheckTime().toString()}</th>
                 @else
+                    <th></th>
                     <th></th>
                 @endif
             </tr>

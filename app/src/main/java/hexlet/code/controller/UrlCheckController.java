@@ -15,7 +15,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class UrlCheckController {
         }
     }
 
-    public static UrlCheck processCheck(String name, long urlId) throws IOException, InterruptedException {
+    public static UrlCheck processCheck(String name, long urlId) throws IOException {
         Connection.Response response = Jsoup.connect(name).execute();
         Document text = response.parse();
         UrlCheck urlCheck = new UrlCheck();
@@ -58,7 +57,7 @@ public class UrlCheckController {
         urlCheck.setDescription(text.select("meta[name=description]").attr("content"));
         urlCheck.setUrlId(urlId);
         urlCheck.setStatusCode((long) response.statusCode());
-        urlCheck.setCreatedAt(Instant.now());
+        //urlCheck.setCreatedAt(Instant.now());
         log.info("Checking URL: " + name);
         log.info("Response status code  = " + response.statusCode());
         log.info("LOGGING: UrlCheckRepository.save name: " + urlCheck.getTitle());

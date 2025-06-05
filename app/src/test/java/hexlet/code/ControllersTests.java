@@ -102,8 +102,10 @@ public final class ControllersTests {
 
     @Test
     public void testShowCorrectIdPage() {
-        Unirest.post(baseUrl + "/urls").field("url", Constants.URLNAME).asString();
-        var response = Unirest.get(baseUrl + "/urls/1").asString();
+        var name = Constants.URLCORRECT;
+        Unirest.post(baseUrl + "/urls").field("url", name).asString();
+        var id = UrlRepository.findName(name).get().getId();
+        var response = Unirest.get(baseUrl + "/urls/" + id).asString();
         String body = response.getBody();
 
         assertThat(body).contains(Constants.URLCORRECT);
@@ -145,10 +147,12 @@ public final class ControllersTests {
 
     @Test
     public void testLastStatuses() throws SQLException {
-        Url url = new Url(Constants.URLCORRECT);
+        String name = Constants.URLCORRECT;
+        Url url = new Url(name);
         url.setCreatedAt(Instant.now());
         UrlRepository.save(url);
-        Unirest.post(baseUrl + "/urls/1/checks")
+        var id = url.getId();
+        Unirest.post(baseUrl + "/urls/" + id + "/checks")
                 .field("title", "Title")
                 .field("h1", "some H1")
                 .asString();

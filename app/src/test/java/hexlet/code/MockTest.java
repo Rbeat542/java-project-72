@@ -1,5 +1,6 @@
 package hexlet.code;
 
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
@@ -8,6 +9,7 @@ import okhttp3.Response;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.TestAbortedException;
 import java.io.IOException;
@@ -32,7 +34,6 @@ public final class MockTest {
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
                 .setBody(fileContent)
-                .setResponseCode(200)
                 .addHeader("Content-Type", "text/html"));
         mockWebServer.start();
     }
@@ -41,19 +42,26 @@ public final class MockTest {
     public void mockTest() {
         String mockServerUrl = mockWebServer.url("/").toString();
         JavalinTest.test(app, (server, client) -> {
-            String json = "url=" + mockServerUrl;
-            assertThat(client.post(NamedRoutes.urlsPath(), json).code()).isEqualTo(200);
+            String url = "url=" + mockServerUrl;
+            assertThat(client.post(NamedRoutes.urlsPath(), url).code()).isEqualTo(200);
+            assertThat(UrlRepository.getEntities().getLast().getName() + "/").isEqualTo(mockServerUrl);
 
             Long id = UrlRepository.getEntities().getLast().getId();
-            client.post(NamedRoutes.urlCheckPath(id));
+            Response checkResponse = client.post(NamedRoutes.urlCheckPath(id), "");
+            String htm = checkResponse.body().string();
+            assertThat(checkResponse.code()).isEqualTo(200);
+
             Response response = client.get("/urls/" + id);
             String html = response.body().string();
-
             assertThat(html).contains("Fake title");
             assertThat(html).contains("Here is the H1 size header");
             assertThat(html).contains("Some description");
-
-            mockWebServer.shutdown();
+            assertThat(UrlCheckRepository.getEntities(id).getLast().getTitle()).isEqualTo("Fake title");
         });
+    }
+
+    @AfterAll
+    public static void afterAll() throws IOException {
+        mockWebServer.shutdown();
     }
 }

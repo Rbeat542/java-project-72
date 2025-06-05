@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS urls CASCADE;
 CREATE TABLE urls (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP
+    created_at TIMESTAMP (0)
 );
 
 
@@ -16,5 +16,5 @@ CREATE TABLE url_checks (
     h1 VARCHAR(200) NOT NULL,
     description VARCHAR(500) NOT NULL,
     url_id BIGINT REFERENCES urls(id) NOT NULL,
-    created_at TIMESTAMP
+    created_at TIMESTAMP (0)
 );
