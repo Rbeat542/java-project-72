@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,14 +15,16 @@ import static hexlet.code.App.getDbUrl;
 public class UrlRepository extends BaseRepository {
     public static void save(Url url) throws SQLException {
         String sql = "INSERT INTO urls (name, created_At) VALUES (?, ?)";
+        Instant now = Instant.now();
         try (var conn = dataSource.getConnection();
-             var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, url.getName());
-            preparedStatement.setTimestamp(2, Timestamp.from(url.getCreatedAt()));
+            preparedStatement.setTimestamp(2, Timestamp.from(now));
             preparedStatement.executeUpdate();
             var generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 url.setId(generatedKeys.getLong(1));
+                url.setCreatedAt(now);
                 log.info("LOGGING: UrlRepository.save saving name: " + url.getName());
                 log.info("LOGGING: UrlRepository.save saving id: " + url.getId());
             } else {

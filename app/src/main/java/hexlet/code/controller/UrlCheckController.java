@@ -13,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,46 +22,38 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 
 @Slf4j
 public class UrlCheckController {
-    public static void check(Context ctx) throws ValidationException, SQLException, InterruptedException {
+    public static void check(Context ctx) throws ValidationException, SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
         try {
-            var urlCheck = processCheck(url.getName(), id);
+            UrlCheck urlCheck = new UrlCheck();
+            Connection.Response response = Jsoup.connect(url.getName()).execute();
+            Document text = response.parse();
+            urlCheck.setTitle(text.title());
+            urlCheck.setH1(text.select("h1").text());
+            urlCheck.setDescription(text.select("meta[name=description]").attr("content"));
+            urlCheck.setUrlId(id);
+            urlCheck.setStatusCode((long) response.statusCode());
+            log.info("Checking URL: " + url.getName());
+            log.info("Response status code  = " + response.statusCode());
+            log.info("LOGGING: UrlCheckController.check name: " + urlCheck.getTitle());
+            log.info("LOGGING: UrlCheckController.check id: " + urlCheck.getId());
+            log.info("LOGGING: UrlCheckController.check title: " + urlCheck.getTitle());
             UrlCheckRepository.save(urlCheck);
             ctx.redirect(NamedRoutes.urlPath(id));
         } catch (Exception e) {
-            if (e instanceof InterruptedException) {
-                Thread.currentThread().interrupt();
-                throw (InterruptedException) e;
-            }
-            log.info("Exception is: " + e);
+            log.info("Exception while url check is: " + e);
             var valError = new ValidationError<>(e.toString());
             var listOfErrors = List.of(valError);
             var errorsMap = new HashMap<String, List<ValidationError<Object>>>();
             errorsMap.put("some", listOfErrors);
-            var list = UrlCheckRepository.getEntities(id);
+            var list = new ArrayList<UrlCheck>();
             var page = new UrlPage(url, list, errorsMap);
-            ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.sessionAttribute("flash", "Ошибка при проверке сайта: " + e);
             page.setFlash(ctx.consumeSessionAttribute("flash"));
             ctx.render("show.jte", model("page", page)).status(422);
         }
     }
 
-    public static UrlCheck processCheck(String name, long urlId) throws IOException {
-        Connection.Response response = Jsoup.connect(name).execute();
-        Document text = response.parse();
-        UrlCheck urlCheck = new UrlCheck();
-        urlCheck.setTitle(text.title());
-        urlCheck.setH1(text.select("h1").text());
-        urlCheck.setDescription(text.select("meta[name=description]").attr("content"));
-        urlCheck.setUrlId(urlId);
-        urlCheck.setStatusCode((long) response.statusCode());
-        //urlCheck.setCreatedAt(Instant.now());
-        log.info("Checking URL: " + name);
-        log.info("Response status code  = " + response.statusCode());
-        log.info("LOGGING: UrlCheckRepository.save name: " + urlCheck.getTitle());
-        log.info("LOGGING: UrlCheckRepository.save id: " + urlCheck.getId());
-        return urlCheck;
-    }
 }

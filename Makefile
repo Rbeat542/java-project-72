@@ -24,5 +24,3 @@ lint:
 	make -C app lint
 
 build-run: build run
-
-.PHONY: build

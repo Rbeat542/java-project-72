@@ -15,6 +15,7 @@ public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
         String sql = "INSERT INTO url_checks (status_code, title, h1, description,"
                 + " url_id, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+        Instant now = Instant.now();
         try (var conn = dataSource.getConnection();
              var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setLong(1, urlCheck.getStatusCode());
@@ -22,11 +23,12 @@ public class UrlCheckRepository extends BaseRepository {
             preparedStatement.setString(3, urlCheck.getH1());
             preparedStatement.setString(4, urlCheck.getDescription());
             preparedStatement.setLong(5, urlCheck.getUrlId());
-            preparedStatement.setTimestamp(6, Timestamp.from(Instant.now()));
+            preparedStatement.setTimestamp(6, Timestamp.from(now));
             preparedStatement.executeUpdate();
             var generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 urlCheck.setId(generatedKeys.getLong(1));
+                urlCheck.setCreatedAt(now);
             } else {
                 throw new SQLException("DB have not returned an id after saving an entity");
             }

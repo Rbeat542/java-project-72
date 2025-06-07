@@ -7,24 +7,18 @@ import hexlet.code.repository.UrlRepository;
 import io.javalin.Javalin;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.TestAbortedException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import static hexlet.code.App.getApp;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Slf4j
 public final class ControllersTests {
     private static Javalin app;
     private static String baseUrl;
-    private static UrlRepository urlRepository;
-    private static UrlCheckRepository urlCheckRepository;
 
     @BeforeAll
     public static void beforeAll() throws SQLException, TestAbortedException {
@@ -47,7 +41,7 @@ public final class ControllersTests {
     }
 
     @Test
-    public void testMainEmptyPage() {
+    public void testMainPage() {
         var response = Unirest.get(baseUrl + "/urls").asString();
         String body = response.getBody();
         assertThat(body).contains("No urls added yet!");
@@ -55,7 +49,7 @@ public final class ControllersTests {
 
         response = Unirest.get(baseUrl).asString();
         body = response.getBody();
-        var urls = urlRepository.getEntities();
+        var urls = UrlRepository.getEntities();
         assertThat(urls.isEmpty());
         assertThat(body).contains("Url analyzer. Main page");
     }
@@ -67,7 +61,6 @@ public final class ControllersTests {
                 .post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
                 .asString();
-        log.info("LOGGING. Response is " + response.toString());
         String body = response.getBody();
         var urls = UrlRepository.getEntities();
 
@@ -81,7 +74,6 @@ public final class ControllersTests {
                 .post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
                 .asString();
-        log.info("LOGGING. Response is " + response.toString());
         body = repeatedResponse.getBody();
         assertThat(body).contains("Страница уже существует");
         assertThat(UrlRepository.getEntities().size()).isEqualTo(1);
@@ -101,7 +93,7 @@ public final class ControllersTests {
     }
 
     @Test
-    public void testShowCorrectIdPage() {
+    public void testShowCorrectPage() {
         var name = Constants.URLCORRECT;
         Unirest.post(baseUrl + "/urls").field("url", name).asString();
         var id = UrlRepository.findName(name).get().getId();
@@ -113,26 +105,20 @@ public final class ControllersTests {
     }
 
     @Test
-    public void testUrlCheckToRepository() throws SQLException {
+    public void testChecksRepository() throws SQLException {
         Url url = new Url(Constants.URLCORRECT);
-        url.setCreatedAt(Instant.now());
         UrlRepository.save(url);
         Long id = UrlRepository.getEntities().getLast().getId();
         UrlCheck urlCheck = new UrlCheck(200L, "Url info", "Url h1 section", "No description", id);
-        urlCheck.setCreatedAt(Instant.now());
         UrlCheckRepository.save(urlCheck);
         assertThat(UrlCheckRepository.getEntities(1L)).isNotEmpty();
         assertThat(UrlCheckRepository.getEntities(1L).getLast().getTitle()).isEqualTo("Url info");
     }
 
-
     @Test
-    public void testRepositories() throws SQLException {
-        String now = new Timestamp(System.currentTimeMillis()).toString();
-
+    public void testRepositorySize() throws SQLException {
         Unirest.post(baseUrl + "/urls")
                 .field("url", Constants.URLNAME)
-                .field("createdAt", now)
                 .asString();
         HttpResponse response = Unirest
                 .get(baseUrl + "/urls/2")
@@ -147,20 +133,15 @@ public final class ControllersTests {
 
     @Test
     public void testLastStatuses() throws SQLException {
-        String name = Constants.URLCORRECT;
-        Url url = new Url(name);
-        url.setCreatedAt(Instant.now());
+        Url url = new Url(baseUrl);
         UrlRepository.save(url);
         var id = url.getId();
-        Unirest.post(baseUrl + "/urls/" + id + "/checks")
-                .field("title", "Title")
-                .field("h1", "some H1")
-                .asString();
+        Unirest.post(baseUrl + "/urls/" + id + "/checks").asString();
 
         var statuses = UrlCheckRepository.getLastStatuses();
 
-        assertThat(statuses).isNotEmpty();
         assertThat(statuses.size()).isEqualTo(1);
+        assertThat(statuses.get(1L).getStatus()).isEqualTo(200);
     }
 
     @AfterAll

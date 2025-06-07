@@ -17,7 +17,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.List;
 import java.util.HashMap;
 
@@ -81,7 +80,6 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Страница уже существует");
         } else {
             var url = new Url(name);
-            url.setCreatedAt(Instant.now());
             UrlRepository.save(url);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.status(422);
