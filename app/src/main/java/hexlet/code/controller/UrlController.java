@@ -27,9 +27,10 @@ public class UrlController {
 
     public static void index(Context ctx) throws SQLException {
         var urls = UrlRepository.getEntities();
-        var statuses = UrlCheckRepository.getLastStatuses();
-        var page = new UrlsPage(urls, statuses);
-        page.setFlash(ctx.consumeSessionAttribute("flash"));
+        var latestChecks = UrlCheckRepository.getLatestChecks();
+        var page = new UrlsPage(urls, latestChecks);
+        page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
+        page.setFlashText(ctx.consumeSessionAttribute("flash"));
         ctx.render("index.jte", model("page", page));
     }
 
@@ -51,7 +52,9 @@ public class UrlController {
             errorsMap.put("some", list);
             var page = new BuildUrlPage(nameEntered, errorsMap);
             ctx.sessionAttribute("flash", "Некорректный URL");
-            page.setFlash(ctx.consumeSessionAttribute("flash"));
+            ctx.sessionAttribute("flash-type", "danger");
+            page.setFlashText(ctx.consumeSessionAttribute("flash"));
+            page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
             ctx.render("mainpage.jte", model("page", page)).status(422);
         }
     }
@@ -62,6 +65,8 @@ public class UrlController {
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
         var list = UrlCheckRepository.getEntities(id);
         var page = new UrlPage(url, list, null);
+        page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
+        page.setFlashText(ctx.consumeSessionAttribute("flash"));
         ctx.render("show.jte", model("page", page));
     }
 
@@ -78,10 +83,12 @@ public class UrlController {
         var urlFound = UrlRepository.findName(name);
         if (urlFound.isPresent()) {
             ctx.sessionAttribute("flash", "Страница уже существует");
+            ctx.sessionAttribute("flash-type", "warning");
         } else {
             var url = new Url(name);
             UrlRepository.save(url);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
+            ctx.sessionAttribute("flash-type", "success");
             ctx.status(422);
             log.info("Execution_log: In UrlController.processUrl the known id is: " + url.getId());
         }

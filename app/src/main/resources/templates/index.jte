@@ -9,17 +9,13 @@ title = @`
 `,
 content = @`
 
-    @if(page != null && page.getFlash() != null && page.getFlash().equals("Страница успешно добавлена"))
-        <div class="alert alert-success" role="alert">
-            ${page.getFlash()}
-        </div>
+    @if(page != null && page.getFlashText() != null)
+        @if(page.getFlashText() != null)
+            <div class="alert alert-${page.getFlashType()}" role="alert">
+                ${page.getFlashText()}
+            </div>
+        @endif
     @endif
-    @if(page != null && page.getFlash() != null && page.getFlash().equals("Страница уже существует"))
-        <div class="alert alert-warning" role="alert">
-            ${page.getFlash()}
-        </div>
-    @endif
-
     @if(page.getUrls().isEmpty())
         <br>
         <p>No urls added yet!</p>
@@ -38,13 +34,13 @@ content = @`
             </thead>
             <tbody>
         @for(var url : page.getUrls())
-            !{var check = page.getLastStatuses().get(url.getId()); }
+            !{var check = page.getLatestChecks().get(url.getId()); }
             <tr>
                 <th>${url.getId()}</th>
                 <th><a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a></th>
                 @if(check != null)
-                    <th>${check.getStatus()}</th>
-                    <th>${check.getCheckTime().toString()}</th>
+                    <th>${check.getStatusCode()}</th>
+                    <th>${check.getCreatedAt().toString()}</th>
                 @else
                     <th></th>
                     <th></th>

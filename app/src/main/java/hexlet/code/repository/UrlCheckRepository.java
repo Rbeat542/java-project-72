@@ -1,6 +1,5 @@
 package hexlet.code.repository;
 
-import hexlet.code.model.LastCheck;
 import hexlet.code.model.UrlCheck;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -50,10 +49,10 @@ public class UrlCheckRepository extends BaseRepository {
                 var h1 = resultSet.getString("h1");
                 var description = resultSet.getString("description");
                 var urlId = resultSet.getLong("url_id");
-                var createdAt = resultSet.getTimestamp("created_at");
+                var createdAt = resultSet.getTimestamp("created_at").toInstant();
                 var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId);
                 urlCheck.setId(id);
-                urlCheck.setCreatedAt(createdAt.toInstant());
+                urlCheck.setCreatedAt(createdAt);
                 result.add(urlCheck);
             }
             if (result == null || result.isEmpty()) {
@@ -65,27 +64,29 @@ public class UrlCheckRepository extends BaseRepository {
         }
     }
 
-    public static Map<Long, LastCheck> getLastStatuses() throws SQLException {
-        var sql = "SELECT DISTINCT ON (url_id) url_id, created_at, status_code FROM url_checks ORDER BY "
-                + "url_id, created_at DESC";
+    public static Map<Long, UrlCheck> getLatestChecks() throws SQLException {
+        var sql = "SELECT DISTINCT ON (url_id) * from url_checks order by url_id DESC, id DESC";
         try (var conn = dataSource.getConnection();
             var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
             Long rowCount = 0L;
-            Map<Long, LastCheck> checks = new HashMap<>();
+            Map<Long, UrlCheck> checks = new HashMap<>();
             while (resultSet.next()) {
                 rowCount++;
                 var urlId = resultSet.getLong("url_id");
                 var statusCode = resultSet.getLong("status_code");
                 var createdAt = resultSet.getTimestamp("created_at").toInstant();
-                var check = new LastCheck(urlId, statusCode, createdAt);
+                var title = resultSet.getString("title");
+                var h1 = resultSet.getString("h1");
+                var description = resultSet.getString("description");
+                var check = new UrlCheck(statusCode, title, h1, description, urlId);
+                check.setCreatedAt(createdAt);
                 checks.put(urlId, check);
             }
             if (checks == null || checks.isEmpty()) {
-                return new HashMap<Long, LastCheck>();
+                return new HashMap<Long, UrlCheck>();
             }
             return checks;
         }
     }
-
 }

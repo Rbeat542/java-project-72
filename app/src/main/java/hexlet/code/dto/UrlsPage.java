@@ -1,6 +1,6 @@
 package hexlet.code.dto;
-import hexlet.code.model.LastCheck;
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,5 +14,5 @@ import java.util.List;
 
 public class UrlsPage extends BasePage {
     private List<Url> urls;
-    private Map<Long, LastCheck> lastStatuses;
+    private Map<Long, UrlCheck> latestChecks;
 }

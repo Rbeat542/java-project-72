@@ -9,9 +9,9 @@ title = @`
 `,
 content = @`
     @if(page != null && page.getErrors() != null)
-        @if(page.getFlash() != null)
-            <div class="alert alert-danger" role="alert">
-                ${page.getFlash()}
+        @if(page.getFlashText() != null)
+            <div class="alert alert-${page.getFlashType()}" role="alert">
+                ${page.getFlashText()}
             </div>
         @endif
     @endif

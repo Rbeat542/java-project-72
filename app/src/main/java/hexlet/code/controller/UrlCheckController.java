@@ -1,24 +1,19 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.UrlPage;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
-import io.javalin.validation.ValidationError;
 import io.javalin.validation.ValidationException;
+import kong.unirest.core.UnirestException;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-import static io.javalin.rendering.template.TemplateUtil.model;
 
 @Slf4j
 public class UrlCheckController {
@@ -41,19 +36,18 @@ public class UrlCheckController {
             log.info("LOGGING: UrlCheckController.check id: " + urlCheck.getId());
             log.info("LOGGING: UrlCheckController.check title: " + urlCheck.getTitle());
             UrlCheckRepository.save(urlCheck);
+            ctx.sessionAttribute("flash", "Страница успешно проверена");
+            ctx.sessionAttribute("flash-type", "success");
             ctx.redirect(NamedRoutes.urlPath(id));
+        } catch (UnirestException e) {
+            ctx.sessionAttribute("flash", "Некорректный адрес: " + e.getMessage());
+            ctx.sessionAttribute("flash-type", "danger");
         } catch (Exception e) {
-            log.info("Exception while url check is: " + e);
-            var valError = new ValidationError<>(e.toString());
-            var listOfErrors = List.of(valError);
-            var errorsMap = new HashMap<String, List<ValidationError<Object>>>();
-            errorsMap.put("some", listOfErrors);
-            var list = new ArrayList<UrlCheck>();
-            var page = new UrlPage(url, list, errorsMap);
-            ctx.sessionAttribute("flash", "Ошибка при проверке сайта: " + e);
-            page.setFlash(ctx.consumeSessionAttribute("flash"));
-            ctx.render("show.jte", model("page", page)).status(422);
+            ctx.sessionAttribute("flash", "Ошибка : " + e.getMessage());
+            ctx.sessionAttribute("flash-type", "danger");
         }
+        ctx.redirect(NamedRoutes.urlPath(id));
     }
+
 
 }

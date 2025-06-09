@@ -124,24 +124,24 @@ public final class ControllersTests {
                 .get(baseUrl + "/urls/2")
                 .asString();
         var list = UrlRepository.getEntities();
-        var statuses = UrlCheckRepository.getLastStatuses();
+        var checks = UrlCheckRepository.getLatestChecks();
 
         assertThat(response.getStatus()).isEqualTo(404);
-        assertThat(statuses).isEmpty();
+        assertThat(checks).isEmpty();
         assertThat(list.size()).isEqualTo(1);
     }
 
     @Test
-    public void testLastStatuses() throws SQLException {
+    public void testLatestChecks() throws SQLException {
         Url url = new Url(baseUrl);
         UrlRepository.save(url);
         var id = url.getId();
         Unirest.post(baseUrl + "/urls/" + id + "/checks").asString();
 
-        var statuses = UrlCheckRepository.getLastStatuses();
+        var checks = UrlCheckRepository.getLatestChecks();
 
-        assertThat(statuses.size()).isEqualTo(1);
-        assertThat(statuses.get(1L).getStatus()).isEqualTo(200);
+        assertThat(checks.size()).isEqualTo(1);
+        assertThat(checks.get(1L).getStatusCode()).isEqualTo(200);
     }
 
     @AfterAll

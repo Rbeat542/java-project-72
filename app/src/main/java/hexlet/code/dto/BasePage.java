@@ -6,5 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BasePage {
-    private String flash;
+    private String flashText;
+    private String flashType;
 }

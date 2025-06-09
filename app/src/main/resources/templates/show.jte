@@ -1,6 +1,9 @@
 @import hexlet.code.dto.UrlPage
+@import hexlet.code.model.UrlCheck
 @import hexlet.code.repository.UrlCheckRepository
 @import hexlet.code.util.NamedRoutes
+@import java.util.Collection
+@import java.util.Collections
 @param UrlPage page
 
 @template.allpages(
@@ -9,12 +12,10 @@ title = @`
     Url analyzer. Url checks info
 `,
 content = @`
-    @if(page != null && page.getErrors() != null)
-        @if(page.getFlash() != null)
-            <div class="alert alert-danger" role="alert">
-                ${page.getFlash()}
+    @if(page != null && page.getFlashText() != null)
+            <div class="alert alert-${page.getFlashType()}" role="alert">
+                ${page.getFlashText()}
             </div>
-        @endif
     @endif
     @if(page != null)
         <br>
@@ -67,14 +68,14 @@ content = @`
         </thead>
         <tbody>
         @if(!page.getList().isEmpty())
-            @for(int i = page.getList().size() - 1; i >= 0; i--)
+            @for (UrlCheck element : page.getList().reversed())
                 <tr>
-                    <th>${page.getList().get(i).getId()}</th>
-                    <th>${page.getList().get(i).getStatusCode()}</th>
-                    <th>${page.getList().get(i).getTitle()}</th>
-                    <th>${page.getList().get(i).getH1()}</th>
-                    <th>${page.getList().get(i).getDescription()}</th>
-                    <th>${page.getList().get(i).getCreatedAt().toString()}</th>
+                    <th>${element.getId()}</th>
+                    <th>${element.getStatusCode()}</th>
+                    <th>${element.getTitle()}</th>
+                    <th>${element.getH1()}</th>
+                    <th>${element.getDescription()}</th>
+                    <th>${element.getCreatedAt().toString()}</th>
                 </tr>
             @endfor
         @endif
