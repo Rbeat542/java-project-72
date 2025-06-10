@@ -45,7 +45,6 @@ public class UrlRepository extends BaseRepository {
                 var url = new Url(name);
                 url.setCreatedAt(createdAt.toInstant());
                 url.setId(id);
-                log.info("LOGGING: UrlRepository.find Repo size: " + UrlRepository.getEntities().size());
                 log.info("LOGGING: UrlRepository.find name: " + url.getName());
                 log.info("LOGGING: UrlRepository.find id: " + url.getId());
                 return Optional.of(url);

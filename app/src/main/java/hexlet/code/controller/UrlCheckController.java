@@ -38,7 +38,6 @@ public class UrlCheckController {
             UrlCheckRepository.save(urlCheck);
             ctx.sessionAttribute("flash", "Страница успешно проверена");
             ctx.sessionAttribute("flash-type", "success");
-            ctx.redirect(NamedRoutes.urlPath(id));
         } catch (UnirestException e) {
             ctx.sessionAttribute("flash", "Некорректный адрес: " + e.getMessage());
             ctx.sessionAttribute("flash-type", "danger");

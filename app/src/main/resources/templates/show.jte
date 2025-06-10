@@ -68,7 +68,7 @@ content = @`
         </thead>
         <tbody>
         @if(!page.getList().isEmpty())
-            @for (UrlCheck element : page.getList().reversed())
+            @for (UrlCheck element : page.getList())
                 <tr>
                     <th>${element.getId()}</th>
                     <th>${element.getStatusCode()}</th>

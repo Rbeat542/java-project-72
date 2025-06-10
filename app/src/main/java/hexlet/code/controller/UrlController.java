@@ -63,7 +63,7 @@ public class UrlController {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
-        var list = UrlCheckRepository.getEntities(id);
+        var list = UrlCheckRepository.getEntities(id).reversed();
         var page = new UrlPage(url, list, null);
         page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
         page.setFlashText(ctx.consumeSessionAttribute("flash"));
